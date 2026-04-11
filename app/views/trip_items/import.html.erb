@@ -1,0 +1,223 @@
+<% content_for :hide_navbar, true %>
+<% content_for :main_class, "flex flex-col overflow-hidden" %>
+
+<%# ── Nav band ── %>
+<div class="h-14 shrink-0 max-w-sm mx-auto w-full px-4 flex items-center justify-between">
+  <%= link_to trip_path(@trip, tab: "trip"),
+        class: "flex items-center gap-2 bg-base-300/70 backdrop-blur-sm text-base-content/70
+                hover:text-base-content hover:bg-base-300 px-4 py-1.5 rounded-full
+                text-xs font-medium transition-colors",
+        data: { turbo_direction: "back" } do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+    </svg>
+    Back
+  <% end %>
+  <span class="flex items-center gap-1.5 bg-base-300/70 backdrop-blur-sm text-base-content/50 px-3 py-1.5 rounded-full text-xs font-medium">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+    </svg>
+    Import ideas
+  </span>
+  <div class="w-24"></div><%# spacer to balance nav %>
+</div>
+
+<%# ── Card ── %>
+<div class="flex-1 min-h-0 overflow-y-auto px-4 pb-6">
+  <div class="max-w-sm mx-auto">
+
+    <% if @preview_items %>
+      <%# ── PREVIEW + CONFIRM ── %>
+      <div class="bg-base-200 border border-base-content/10 rounded-3xl overflow-hidden">
+
+        <%# Header %>
+        <div class="px-5 pt-5 pb-4">
+          <p class="text-xl font-bold text-base-content">Review ideas</p>
+          <p class="text-xs text-base-content/50 mt-1">
+            <%= @preview_items.count { |i| i["name"].present? } %> item(s) will be added
+            <% if @skipped_count > 0 %>
+              · <span class="text-warning"><%= @skipped_count %> skipped (missing name)</span>
+            <% end %>
+          </p>
+        </div>
+
+        <%# Perforation %>
+        <div class="relative flex items-center h-5 shrink-0">
+          <div class="absolute -left-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+          <div class="flex-1 border-t-2 border-dashed border-base-content/15 mx-3"></div>
+          <div class="absolute -right-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+        </div>
+
+        <%# Preview list %>
+        <div class="px-5 py-4 space-y-2">
+          <% @preview_items.each do |item| %>
+            <% next if item["name"].blank? %>
+            <% kind = TripItem.kinds.keys.include?(item["kind"].to_s) ? item["kind"].to_s : "other" %>
+            <div class="flex items-start gap-3 px-3 py-3 rounded-xl bg-base-300/30 border border-base-content/5">
+              <span class="shrink-0 mt-0.5 text-base-content/40">
+                <%= trip_item_kind_icon(kind, css_class: "h-4 w-4") %>
+              </span>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-base-content leading-tight"><%= item["name"] %></p>
+                <% if item["address"].present? %>
+                  <p class="text-xs text-base-content/50 mt-0.5 truncate"><%= item["address"] %></p>
+                <% end %>
+                <% if item["notes"].present? %>
+                  <p class="text-xs text-base-content/40 mt-0.5 leading-snug line-clamp-2"><%= item["notes"] %></p>
+                <% end %>
+              </div>
+              <span class="shrink-0 text-[10px] text-base-content/40 font-medium mt-0.5 capitalize"><%= trip_item_kind_label(kind) %></span>
+            </div>
+          <% end %>
+
+          <% if @preview_items.count { |i| i["name"].present? } == 0 %>
+            <p class="text-sm text-base-content/40 text-center py-4">No valid items found.</p>
+          <% end %>
+        </div>
+
+        <%# Perforation %>
+        <div class="relative flex items-center h-5 shrink-0">
+          <div class="absolute -left-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+          <div class="flex-1 border-t-2 border-dashed border-base-content/15 mx-3"></div>
+          <div class="absolute -right-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+        </div>
+
+        <%# Actions %>
+        <div class="px-5 py-4 flex gap-3">
+          <%= link_to import_trip_trip_items_path(@trip),
+                class: "btn btn-sm flex-1",
+                data: { turbo_direction: "back" } do %>
+            Edit JSON
+          <% end %>
+
+          <% if @preview_items.count { |i| i["name"].present? } > 0 %>
+            <%= form_with url: import_trip_trip_items_path(@trip), method: :post, class: "flex-1" do |f| %>
+              <%= f.hidden_field :confirm, value: "1" %>
+              <%= f.hidden_field :items_json, value: @raw_json %>
+              <%= f.submit "Add to itinerary", class: "btn btn-primary btn-sm w-full" %>
+            <% end %>
+          <% end %>
+        </div>
+
+      </div>
+
+    <% else %>
+      <%# ── INPUT FORM ── %>
+      <div class="bg-base-200 border border-base-content/10 rounded-3xl overflow-hidden">
+
+        <%# Header %>
+        <div class="px-5 pt-5 pb-4">
+          <p class="text-xl font-bold text-base-content">Import from AI</p>
+          <p class="text-xs text-base-content/50 mt-1 leading-relaxed">
+            Ask any AI assistant to generate ideas using the prompt below, then paste the JSON here.
+          </p>
+        </div>
+
+        <%# Perforation %>
+        <div class="relative flex items-center h-5 shrink-0">
+          <div class="absolute -left-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+          <div class="flex-1 border-t-2 border-dashed border-base-content/15 mx-3"></div>
+          <div class="absolute -right-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+        </div>
+
+        <%# Prompt template — copyable %>
+        <div class="px-5 py-4"
+             data-controller="clipboard"
+             data-clipboard-text-value='I am planning a trip and need ideas in a specific JSON format.
+Return ONLY a JSON array with no explanation or markdown:
+
+[
+  {
+    "kind": "stay | eat | do | shop | other",
+    "name": "Name of the place or activity",
+    "address": "City, Country (optional)",
+    "notes": "Any useful tips (optional)",
+    "starts_at": "YYYY-MM-DDTHH:MM (optional)"
+  }
+]
+
+My trip: [DESCRIBE YOUR TRIP HERE]'>
+          <div class="flex items-center justify-between mb-2">
+            <p class="dp-label">Prompt template</p>
+            <button type="button"
+                    data-action="click->clipboard#copy"
+                    class="flex items-center gap-1.5 text-[11px] font-medium text-primary/70 hover:text-primary transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+              </svg>
+              <span data-clipboard-target="label">Copy</span>
+            </button>
+          </div>
+          <div class="font-mono text-[10px] text-base-content/50 leading-relaxed bg-base-300/30 rounded-xl px-3 py-3 whitespace-pre-wrap border border-base-content/5">Return ONLY a JSON array:
+
+[
+  {
+    "kind": "stay | eat | do | shop | other",
+    "name": "...",
+    "address": "... (optional)",
+    "notes": "... (optional)",
+    "starts_at": "YYYY-MM-DDTHH:MM (optional)"
+  }
+]
+
+My trip: [DESCRIBE YOUR TRIP HERE]</div>
+        </div>
+
+        <%# Perforation %>
+        <div class="relative flex items-center h-5 shrink-0">
+          <div class="absolute -left-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+          <div class="flex-1 border-t-2 border-dashed border-base-content/15 mx-3"></div>
+          <div class="absolute -right-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+        </div>
+
+        <%# JSON input form %>
+        <div class="px-5 py-4"
+             data-controller="json-file">
+
+          <% if @parse_error %>
+            <div class="mb-3 px-3 py-2.5 rounded-xl bg-error/10 border border-error/20 text-xs text-error font-medium">
+              <%= @parse_error %>
+            </div>
+          <% end %>
+
+          <%= form_with url: import_trip_trip_items_path(@trip), method: :post do |f| %>
+
+            <%# File upload %>
+            <div class="mb-3">
+              <p class="dp-label mb-1.5">Upload a .json file</p>
+              <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl
+                            bg-base-300/20 border border-base-content/5
+                            hover:bg-primary/10 hover:border-primary/20 transition-colors cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                </svg>
+                <span data-json-file-target="label"
+                      class="text-xs text-base-content/50 flex-1 truncate">Choose file…</span>
+                <%= f.file_field :json_file, accept: ".json,application/json",
+                      class: "sr-only",
+                      data: { action: "change->json-file#load", "json-file-target": "input" } %>
+              </label>
+            </div>
+
+            <%# Textarea %>
+            <div class="mb-4">
+              <p class="dp-label mb-1.5">Or paste JSON</p>
+              <%= f.text_area :items_json,
+                    value: @raw_json,
+                    rows: 8,
+                    placeholder: '[{"kind":"eat","name":"..."},...]',
+                    data: { "json-file-target": "textarea" },
+                    class: "textarea w-full font-mono text-xs bg-base-300/20 border-base-content/10
+                            focus:border-primary/40 focus:outline-none rounded-xl resize-none
+                            placeholder:text-base-content/25" %>
+            </div>
+
+            <%= f.submit "Preview", class: "btn btn-primary w-full" %>
+          <% end %>
+        </div>
+
+      </div>
+    <% end %>
+
+  </div>
+</div>

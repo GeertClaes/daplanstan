@@ -1,0 +1,20 @@
+<% content_for :navbar_center do %>
+  <div class="flex items-center gap-0.5 min-w-0 max-w-xs sm:max-w-sm">
+
+    <%# Trip name — links back to the itinerary %>
+    <%= link_to trip_path(@trip), class: "flex flex-col items-center min-w-0 px-1 hover:opacity-80 transition-opacity" do %>
+      <span class="font-bold text-sm leading-tight truncate max-w-full"><%= @trip.title %></span>
+      <span class="text-[11px] text-base-content/50 leading-tight">
+        <% if @trip.start_date && @trip.end_date %>
+          <%= @trip.start_date.strftime("%b %-d") %> – <%= @trip.end_date.strftime("%b %-d, %Y") %>
+        <% elsif @trip.start_date %>
+          From <%= @trip.start_date.strftime("%b %-d, %Y") %>
+        <% else %>
+          Dates TBD
+        <% end %>
+      </span>
+    <% end %>
+
+
+  </div>
+<% end %>

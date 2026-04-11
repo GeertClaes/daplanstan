@@ -1,0 +1,149 @@
+<% content_for :hide_navbar, true %>
+<% content_for :main_class, "overflow-y-auto py-6" %>
+
+<%# ── Back pill ── %>
+<div class="max-w-2xl mx-auto px-4 pb-3">
+  <%= link_to trip_inbox_items_path(@trip),
+        class: "inline-flex items-center gap-1.5 bg-base-300/70 backdrop-blur-sm
+                text-base-content/70 hover:text-base-content hover:bg-base-300
+                px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
+        data: { turbo_direction: "back" } do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" viewBox="0 0 48 48" fill="currentColor">
+      <path d="M31.092 18.779L24.5608 26.1327C24.2507 26.4818 23.7493 26.4818 23.4392 26.1327L16.908 18.779C16.4066 18.2144 16.7628 17.2562 17.4688 17.2562H21.8889V5.89136C21.8889 5.40111 22.2451 5 22.6806 5H25.3194C25.7549 5 26.1111 5.40111 26.1111 5.89136V17.2562H30.5313C31.2372 17.2562 31.5934 18.2144 31.092 18.779ZM39.8333 31.1466H31.9167L29.8056 35.9006H18.1944L16.0833 31.1466H8.16667V39.466H39.8333V31.1466ZM43 31.31V39.466C43 41.4344 41.5816 43.0315 39.8333 43.0315H8.16667C6.4184 43.0315 5 41.4344 5 39.466V31.31C5 30.4335 5.28368 29.5942 5.79826 28.9405L12.501 20.4577C12.6528 20.2646 12.8243 20.0937 13.009 19.9377C13.1674 19.8115 13.3785 19.8338 13.517 19.9897L15.1531 21.8393C15.2983 22.0027 15.3049 22.2776 15.1663 22.4484L11.1156 27.5812H18.0427L20.1538 32.3351H27.8528L29.9639 27.5812H36.891L32.8403 22.4484C32.7017 22.2701 32.7083 22.0102 32.8535 21.8393L34.4764 19.9823C34.6083 19.8263 34.826 19.804 34.9844 19.9303C35.1757 20.0863 35.3472 20.2572 35.5056 20.4577L42.2083 28.9405C42.7163 29.5942 43 30.441 43 31.31Z"/>
+    </svg>
+    Inbox
+  <% end %>
+</div>
+
+<div class="max-w-2xl mx-auto px-4">
+
+  <%# ── Email card ── %>
+  <div class="bg-base-200 border border-base-content/10 rounded-3xl overflow-hidden shadow-xl">
+
+    <%# Header: subject + sender + date %>
+    <div class="px-5 pt-5 pb-4 border-b border-base-content/10">
+      <h1 class="text-base font-semibold text-base-content leading-snug mb-3"><%= @item.subject.presence || "(no subject)" %></h1>
+      <div class="flex items-center gap-3">
+        <% sender_traveler = @trip.trip_members.joins(:traveler)
+                                  .find_by(travelers: { email: @item.from_email })&.traveler %>
+        <% if sender_traveler&.avatar_url.present? %>
+          <%= image_tag sender_traveler.avatar(size: 64),
+                class: "w-9 h-9 rounded-full object-cover shrink-0",
+                referrerpolicy: "no-referrer",
+                alt: sender_traveler.name %>
+        <% else %>
+          <div class="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+            <%= (@item.from_name.presence || @item.from_email).first.upcase %>
+          </div>
+        <% end %>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-base-content/70 truncate"><%= @item.from_name.presence || @item.from_email %></p>
+          <p class="text-xs text-base-content/40 truncate"><%= @item.from_email %></p>
+        </div>
+        <p class="text-xs text-base-content/40 shrink-0"><%= @item.received_at.strftime("%b %-d · %H:%M") %></p>
+      </div>
+    </div>
+
+    <%# ── Action strip (between header and body) ── %>
+    <div class="px-5 py-3 border-b border-base-content/10">
+
+      <% if @item.pending_review? %>
+        <%# Parsed and ready — let the user decide %>
+        <div class="flex gap-2">
+          <%= button_to "Add to trip", trip_inbox_item_path(@trip, @item),
+                params: { action_type: "confirm" }, method: :patch,
+                class: "btn btn-primary btn-sm flex-1" %>
+          <%= button_to "Discard", trip_inbox_item_path(@trip, @item),
+                params: { action_type: "discard" }, method: :patch,
+                class: "btn btn-ghost btn-sm" %>
+        </div>
+
+      <% elsif @item.pending_approval? %>
+        <%# Unknown sender — needs approval before parsing %>
+        <div class="flex items-center justify-between gap-4">
+          <p class="text-sm text-base-content/60">
+            Approve <strong class="text-base-content/80"><%= @item.from_email %></strong>
+            to process this and future emails automatically.
+          </p>
+          <%= button_to "Approve sender", trip_approved_senders_path(@trip),
+                params: { email: @item.from_email, inbox_item_id: @item.id },
+                class: "btn btn-warning btn-sm shrink-0" %>
+        </div>
+
+      <% elsif @item.failed? %>
+        <%# Parsing failed %>
+        <div class="flex items-center justify-between gap-4">
+          <p class="text-sm text-base-content/60">AI could not extract booking details from this email.</p>
+          <%= button_to "Retry", trip_inbox_item_path(@trip, @item),
+                params: { action_type: "retry" }, method: :patch,
+                class: "btn btn-sm btn-outline shrink-0" %>
+        </div>
+
+      <% elsif @item.confirmed? %>
+        <%# Added — show links to the created trip item and expense %>
+        <div class="flex items-center justify-between gap-3">
+
+          <%# Trip item pill %>
+          <% if @primary_item %>
+            <%= link_to trip_trip_item_path(@trip, @primary_item),
+                  class: "flex items-center gap-1.5 bg-primary/10 text-primary px-3 py-1.5
+                          rounded-full text-xs font-medium hover:bg-primary/20 transition-colors truncate",
+                  data: { turbo_direction: "forward" } do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+              </svg>
+              <span class="truncate"><%= @primary_item.name %></span>
+            <% end %>
+          <% else %>
+            <span class="flex items-center gap-1.5 text-base-content/30 text-xs px-3 py-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+              </svg>
+              No itinerary item
+            </span>
+          <% end %>
+
+          <%# Expense pill %>
+          <% if @primary_expense %>
+            <%= link_to trip_expense_path(@trip, @primary_expense),
+                  class: "flex items-center gap-1.5 bg-success/10 text-success px-3 py-1.5
+                          rounded-full text-xs font-medium hover:bg-success/20 transition-colors shrink-0",
+                  data: { turbo_direction: "forward" } do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+              </svg>
+              <%= number_with_precision(@primary_expense.amount, precision: 2) %> <%= @primary_expense.currency %>
+            <% end %>
+          <% else %>
+            <span class="flex items-center gap-1.5 text-base-content/30 text-xs px-3 py-1.5 shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+              </svg>
+              No expense
+            </span>
+          <% end %>
+
+        </div>
+
+      <% elsif @item.discarded? %>
+        <div class="flex items-center gap-2 text-base-content/40">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+          <p class="text-sm">Discarded</p>
+        </div>
+
+      <% end %>
+    </div>
+
+    <%# Email body %>
+    <div class="px-5 py-5 text-sm leading-relaxed text-base-content/75 space-y-2">
+      <%= render_email_text(@item.raw_body) %>
+    </div>
+
+  </div>
+
+</div>

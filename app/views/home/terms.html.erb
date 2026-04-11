@@ -1,0 +1,61 @@
+<% content_for :nav_right do %>
+  <%= link_to "/", class: "flex items-center gap-1.5 text-sm font-medium px-4 py-1.5 rounded-full
+                            transition-colors hover:bg-white/10",
+                   style: "color: rgba(255,255,255,0.5)" do %>
+    Back
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+    </svg>
+  <% end %>
+<% end %>
+
+<div class="max-w-2xl mx-auto px-6 pt-28 pb-20 text-base-content">
+
+  <h1 class="text-3xl font-bold mb-2">Terms of Service</h1>
+  <p class="text-sm text-base-content/40 mb-10">Last updated: April 2026</p>
+
+  <div class="space-y-8 text-base-content/80 leading-relaxed">
+
+    <section>
+      <h2 class="text-lg font-semibold text-base-content mb-2">1. Acceptance</h2>
+      <p>By using DaPlanStan you agree to these terms. If you do not agree, do not use the service.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-base-content mb-2">2. Use of the service</h2>
+      <p>DaPlanStan is provided for personal trip planning purposes. You agree not to use it for any unlawful purpose, to attempt to gain unauthorised access to other users' data, or to abuse the inbound email or AI processing features.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-base-content mb-2">3. Beta software</h2>
+      <p>DaPlanStan is currently in beta. Features may change, break, or be removed without notice. We make no guarantees about uptime or data retention during the beta period.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-base-content mb-2">4. Your content</h2>
+      <p>You retain ownership of any content you add to DaPlanStan (trips, notes, expenses, etc.). By using the service you grant us permission to store and process that content to provide the service to you.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-base-content mb-2">5. Open source</h2>
+      <p>DaPlanStan is open source software. The source code is available under its licence on GitHub. Self-hosted deployments are your own responsibility.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-base-content mb-2">6. Limitation of liability</h2>
+      <p>The service is provided "as is" without warranty of any kind. We are not liable for any loss of data, travel disruption, or other damages arising from use of the service.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-base-content mb-2">7. Changes</h2>
+      <p>We may update these terms from time to time. Continued use of the service after changes constitutes acceptance of the new terms.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-base-content mb-2">8. Contact</h2>
+      <p>Questions? Email <a href="mailto:hey@daplanstan.com" class="text-primary hover:underline">hey@daplanstan.com</a>.</p>
+    </section>
+
+  </div>
+
+</div>

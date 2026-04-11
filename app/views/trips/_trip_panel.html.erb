@@ -1,0 +1,228 @@
+<% is_owner = current_member&.owner? %>
+
+<div class="max-w-sm mx-auto px-4 py-4"
+     data-controller="trip-delete"
+     data-trip-delete-title-value="<%= @trip.title %>">
+
+  <%# ── Boarding-pass card ── %>
+  <div class="bg-base-200 border border-base-content/10 rounded-3xl
+              overflow-visible flex flex-col">
+
+    <%# ── TOP: title + cover photo ── %>
+    <div class="px-5 pt-5 pb-4 flex items-start justify-between gap-3 shrink-0">
+      <div class="flex-1 min-w-0">
+        <p class="text-2xl font-bold text-base-content leading-tight"><%= @trip.title %></p>
+      </div>
+      <% if (cover_src = trip_cover_src(@trip)) %>
+        <div class="w-20 h-14 rounded-xl overflow-hidden shrink-0 border border-base-content/10 shadow-md">
+          <img src="<%= cover_src %>" alt="<%= @trip.title %>"
+               class="w-full h-full object-cover">
+        </div>
+      <% end %>
+    </div>
+
+    <%# ── PERFORATION 1 ── %>
+    <div class="relative flex items-center h-5 shrink-0">
+      <div class="absolute -left-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+      <div class="flex-1 border-t-2 border-dashed border-base-content/15 mx-3"></div>
+      <div class="absolute -right-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+    </div>
+
+    <%# ── MIDDLE: dates, inbox, travellers ── %>
+    <div class="px-5 py-4 space-y-4">
+
+      <%# WHEN / UNTIL %>
+      <div class="grid grid-cols-2 gap-2">
+        <div class="px-3 py-2.5 rounded-xl bg-base-300/20 border border-base-content/5">
+          <p class="dp-label">When</p>
+          <p class="text-xs font-semibold text-base-content leading-tight mt-0.5">
+            <%= @trip.start_date.strftime("%-d %b %Y") %>
+          </p>
+        </div>
+        <div class="px-3 py-2.5 rounded-xl bg-base-300/20 border border-base-content/5">
+          <p class="dp-label">Until</p>
+          <p class="text-xs font-semibold text-base-content leading-tight mt-0.5">
+            <%= @trip.end_date.strftime("%-d %b %Y") %>
+          </p>
+        </div>
+      </div>
+
+      <%# INBOX — copy address + open inbox button %>
+      <div data-controller="clipboard" data-clipboard-text-value="<%= @trip.inbound_email %>">
+        <p class="dp-label mb-1.5">Inbox</p>
+
+        <%# Copy address row %>
+        <button type="button"
+                data-action="click->clipboard#copy"
+                class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl
+                       bg-base-300/20 border border-base-content/5
+                       hover:bg-primary/10 hover:border-primary/20 transition-colors
+                       text-left group mb-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-base-content/40 group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+          <span class="font-mono text-xs text-base-content/70 flex-1 truncate"><%= @trip.inbound_email %></span>
+          <span data-clipboard-target="label"
+                class="text-[10px] text-primary/60 group-hover:text-primary transition-colors shrink-0 font-medium">
+            Copy
+          </span>
+        </button>
+
+        <%# Open inbox button %>
+        <% count = @inbox_items.size %>
+        <div class="grid grid-cols-2">
+        <%= link_to trip_inbox_items_path(@trip),
+              class: "flex items-center gap-2.5 px-3 py-2.5 rounded-xl
+                      bg-primary/10 border border-primary/20
+                      hover:bg-primary/20 transition-colors",
+              data: { turbo_direction: "forward" } do %>
+          <%= inline_svg("Inbox.svg", css_class: "h-4 w-4 shrink-0 text-primary") %>
+          <div class="min-w-0">
+            <p class="dp-label">Inbox</p>
+            <p class="text-xs font-semibold text-primary leading-tight mt-0.5">
+              <%= count %> email<%= count == 1 ? "" : "s" %> ›
+              <% if @inbox_pending_count > 0 %>
+                <span class="text-warning font-semibold">· <%= @inbox_pending_count %> to review</span>
+              <% end %>
+            </p>
+          </div>
+        <% end %>
+        </div>
+      </div>
+
+      <%# TRAVELLERS %>
+      <div>
+        <p class="dp-label mb-2">Travellers</p>
+        <div class="flex flex-wrap gap-2">
+          <% @members.each do |member| %>
+            <div class="flex flex-col items-center gap-1 p-2 rounded-xl bg-base-300/20 border border-base-content/5 w-16">
+              <div class="w-10 h-10 rounded-full overflow-hidden ring-2 ring-base-content/10">
+                <%= image_tag member.traveler.avatar(size: 64),
+                      alt: member.traveler.name,
+                      class: "w-full h-full object-cover",
+                      referrerpolicy: "no-referrer" %>
+              </div>
+              <p class="text-[10px] text-base-content/60 leading-tight text-center truncate w-full">
+                <%= member.traveler.name.split(" ").first %>
+              </p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+    </div>
+
+    <%# ── PERFORATION 2 ── %>
+    <div class="relative flex items-center h-5 shrink-0">
+      <div class="absolute -left-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+      <div class="flex-1 border-t-2 border-dashed border-base-content/15 mx-3"></div>
+      <div class="absolute -right-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+    </div>
+
+    <%# ── BOTTOM: action buttons (owner only) ── %>
+    <% if is_owner %>
+      <div class="px-5 py-4 shrink-0 flex items-center justify-between">
+
+        <%# Delete — opens confirmation dialog %>
+        <button type="button"
+                data-action="click->trip-delete#open"
+                class="w-12 h-12 rounded-full bg-error text-error-content
+                       hover:bg-error/80 transition-colors
+                       flex items-center justify-center shrink-0
+                       shadow-lg shadow-error/30">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+        </button>
+
+        <%# Action pill: Edit | Cover image | Travelers %>
+        <div class="flex items-center bg-base-100/60 backdrop-blur-sm rounded-full overflow-hidden border border-base-content/8 px-1">
+
+          <%# Edit trip details %>
+          <%= link_to edit_trip_path(@trip),
+                class: "flex flex-col items-center justify-center gap-0.5 px-3 h-14
+                        text-base-content/60 hover:text-base-content hover:bg-base-300/60 transition-colors",
+                data: { turbo_direction: "forward" } do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+            </svg>
+            <span class="text-[9px] font-medium leading-none">Edit</span>
+          <% end %>
+
+          <div class="w-px h-6 bg-base-content/10"></div>
+
+          <%# Cover photo %>
+          <%= link_to cover_trip_path(@trip),
+                class: "flex flex-col items-center justify-center gap-0.5 px-3 h-14
+                        text-base-content/60 hover:text-base-content hover:bg-base-300/60 transition-colors",
+                data: { turbo_direction: "forward" } do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span class="text-[9px] font-medium leading-none">Photo</span>
+          <% end %>
+
+          <div class="w-px h-6 bg-base-content/10"></div>
+
+          <%# Manage travellers %>
+          <%= link_to travelers_trip_path(@trip),
+                class: "flex flex-col items-center justify-center gap-0.5 px-3 h-14
+                        text-base-content/60 hover:text-base-content hover:bg-base-300/60 transition-colors",
+                data: { turbo_direction: "forward" } do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            <span class="text-[9px] font-medium leading-none">Members</span>
+          <% end %>
+
+          <div class="w-px h-6 bg-base-content/10"></div>
+
+          <%# Import AI ideas %>
+          <%= link_to import_trip_trip_items_path(@trip),
+                class: "flex flex-col items-center justify-center gap-0.5 px-3 h-14
+                        text-base-content/60 hover:text-base-content hover:bg-base-300/60 transition-colors",
+                data: { turbo_direction: "forward" } do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+            </svg>
+            <span class="text-[9px] font-medium leading-none">Import</span>
+          <% end %>
+
+        </div>
+      </div>
+    <% end %>
+
+  </div><%# end boarding-pass card %>
+
+  <%# ── Delete confirmation dialog ── %>
+  <dialog data-trip-delete-target="dialog"
+          class="bg-base-200 border border-error/30 rounded-2xl shadow-2xl
+                 max-w-sm w-[calc(100vw-2rem)] mx-auto p-6
+                 backdrop:bg-base-100/70 backdrop:backdrop-blur-sm">
+    <h3 class="text-base font-bold mb-1">Delete this trip?</h3>
+    <p class="text-sm text-base-content/60 mb-4 leading-relaxed">
+      This permanently deletes <strong class="text-base-content"><%= @trip.title %></strong>
+      and all its data. Type the trip name to confirm.
+    </p>
+    <input type="text"
+           data-trip-delete-target="input"
+           data-action="input->trip-delete#check"
+           placeholder="<%= @trip.title %>"
+           autocomplete="off"
+           class="input w-full mb-4 text-sm bg-base-300 border-base-content/20">
+    <div class="flex gap-2">
+      <button type="button"
+              data-action="click->trip-delete#close"
+              class="btn flex-1 btn-sm">
+        Cancel
+      </button>
+      <%= button_to trip_path(@trip), method: :delete,
+            data: { trip_delete_target: "confirm" },
+            class: "btn btn-error btn-sm flex-1",
+            disabled: true do %>
+        Delete trip
+      <% end %>
+    </div>
+  </dialog>
+
+</div>

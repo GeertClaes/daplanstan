@@ -1,0 +1,105 @@
+<%= turbo_stream_from @trip %>
+<% content_for :hide_navbar, true %>
+<% content_for :main_class, "overflow-y-auto" %>
+
+<div class="max-w-lg mx-auto px-4 pb-8"
+     style="padding-top: max(1.25rem, env(safe-area-inset-top))"
+     data-controller="pull-to-refresh">
+
+  <%# ── Nav band ── %>
+  <div class="h-14 shrink-0 w-full flex items-center justify-between mb-1">
+
+    <%# Back to Trip tab %>
+    <%= link_to trip_path(@trip, tab: "trip"),
+          class: "flex items-center gap-2 bg-base-300/70 backdrop-blur-sm text-base-content/70
+                  hover:text-base-content hover:bg-base-300 px-4 py-1.5 rounded-full
+                  text-xs font-medium transition-colors",
+          data: { turbo_direction: "back" } do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Trip
+    <% end %>
+
+    <%# Center: Inbox label %>
+    <span class="flex items-center gap-1.5 bg-base-300/70 backdrop-blur-sm text-base-content/50 px-3 py-1.5 rounded-full text-xs font-medium">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" viewBox="0 0 48 48" fill="currentColor">
+        <path d="M31.092 18.779L24.5608 26.1327C24.2507 26.4818 23.7493 26.4818 23.4392 26.1327L16.908 18.779C16.4066 18.2144 16.7628 17.2562 17.4688 17.2562H21.8889V5.89136C21.8889 5.40111 22.2451 5 22.6806 5H25.3194C25.7549 5 26.1111 5.40111 26.1111 5.89136V17.2562H30.5313C31.2372 17.2562 31.5934 18.2144 31.092 18.779ZM39.8333 31.1466H31.9167L29.8056 35.9006H18.1944L16.0833 31.1466H8.16667V39.466H39.8333V31.1466ZM43 31.31V39.466C43 41.4344 41.5816 43.0315 39.8333 43.0315H8.16667C6.4184 43.0315 5 41.4344 5 39.466V31.31C5 30.4335 5.28368 29.5942 5.79826 28.9405L12.501 20.4577C12.6528 20.2646 12.8243 20.0937 13.009 19.9377C13.1674 19.8115 13.3785 19.8338 13.517 19.9897L15.1531 21.8393C15.2983 22.0027 15.3049 22.2776 15.1663 22.4484L11.1156 27.5812H18.0427L20.1538 32.3351H27.8528L29.9639 27.5812H36.891L32.8403 22.4484C32.7017 22.2701 32.7083 22.0102 32.8535 21.8393L34.4764 19.9823C34.6083 19.8263 34.826 19.804 34.9844 19.9303C35.1757 20.0863 35.3472 20.2572 35.5056 20.4577L42.2083 28.9405C42.7163 29.5942 43 30.441 43 31.31Z"/>
+      </svg>
+      Inbox
+    </span>
+
+    <%# Email count %>
+    <span class="bg-base-300/70 backdrop-blur-sm text-base-content/40 px-3 py-1.5 rounded-full text-xs font-medium">
+      <%= @items.size %> email<%= @items.size == 1 ? "" : "s" %>
+    </span>
+
+  </div>
+
+  <% if @items.empty? %>
+
+    <%# ── Empty state ── %>
+    <div class="bg-base-200 border border-base-content/8 rounded-2xl flex flex-col items-center py-16 px-4 text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-base-content/20 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+      </svg>
+      <p class="text-sm text-base-content/40">No emails yet</p>
+      <p class="text-xs text-base-content/25 mt-1">Forward booking confirmations to your trip address</p>
+    </div>
+
+  <% else %>
+
+    <%# ── Email list ── %>
+    <div class="bg-base-200 border border-base-content/8 rounded-2xl overflow-hidden">
+      <% @items.each_with_index do |item, i| %>
+        <%
+          ui_status = if item.pending_approval?    then :unknown_sender
+                      elsif item.failed?           then :parse_failed
+                      elsif item.pending_review?   then :needs_review
+                      elsif item.confirmed?        then :added
+                      else                              :discarded
+                      end
+          unread = ui_status.in?([:needs_review, :unknown_sender, :parse_failed])
+        %>
+        <%= link_to trip_inbox_item_path(@trip, item),
+              class: "flex items-center gap-3 px-4 py-3.5 transition-colors
+                      hover:bg-base-300/40 active:bg-base-300/60
+                      #{ i < @items.size - 1 ? "border-b border-base-content/8" : "" }",
+              data: { turbo_direction: "forward" } do %>
+
+          <%# Sender avatar %>
+          <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0
+                      <%= unread ? "bg-primary/15 text-primary" : "bg-base-300 text-base-content/40" %>">
+            <%= (item.from_name.presence || item.from_email).first.upcase %>
+          </div>
+
+          <%# Subject + sender %>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm <%= unread ? "font-semibold text-base-content" : "font-medium text-base-content/60" %> truncate leading-snug">
+              <%= item.subject.presence || "(no subject)" %>
+            </p>
+            <p class="text-xs text-base-content/40 mt-0.5 truncate">
+              <%= item.from_name.presence || item.from_email %>
+            </p>
+          </div>
+
+          <%# Date + status dot %>
+          <div class="flex flex-col items-end gap-1.5 shrink-0">
+            <p class="text-[11px] text-base-content/40"><%= item.received_at.strftime("%b %-d") %></p>
+            <% case ui_status
+               when :needs_review   %><span class="w-2 h-2 rounded-full bg-primary"></span>
+            <% when :unknown_sender %><span class="w-2 h-2 rounded-full bg-warning"></span>
+            <% when :parse_failed   %><span class="w-2 h-2 rounded-full bg-error"></span>
+            <% when :added          %><span class="w-2 h-2 rounded-full bg-success"></span>
+            <% end %>
+          </div>
+
+        <% end %>
+      <% end %>
+    </div>
+
+    <%== series_nav(@pagy) if @pagy.pages > 1 %>
+
+  <% end %>
+
+</div>
