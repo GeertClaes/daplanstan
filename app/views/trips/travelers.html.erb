@@ -1,0 +1,108 @@
+<%# Hide global navbar — the card IS the screen %>
+<% content_for :hide_navbar, true %>
+<% content_for :main_class, "flex flex-col overflow-hidden" %>
+
+<%# ── Nav band ── %>
+<div class="h-14 shrink-0 max-w-sm mx-auto w-full px-4 flex items-center">
+</div>
+
+<%# ── Card ── %>
+<div class="flex-1 min-h-0 px-4 pb-4">
+  <div class="max-w-sm mx-auto h-full bg-base-200 border border-base-content/10 rounded-3xl
+              overflow-visible flex flex-col">
+
+    <%# ── TOP: trip name ── %>
+    <div class="px-5 pt-5 pb-4 shrink-0">
+      <p class="text-2xl font-bold text-base-content leading-tight"><%= @trip.title %></p>
+    </div>
+
+    <%# ── PERFORATION 1 ── %>
+    <div class="relative flex items-center h-5 shrink-0">
+      <div class="absolute -left-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+      <div class="flex-1 border-t-2 border-dashed border-base-content/15 mx-3"></div>
+      <div class="absolute -right-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+    </div>
+
+    <%# ── MIDDLE: traveler list + add form ── %>
+    <div class="flex-1 min-h-0 overflow-y-auto px-5 py-4 flex flex-col gap-4">
+
+      <%# Traveler list %>
+      <div class="flex flex-col gap-2">
+        <p class="dp-label">Travellers</p>
+        <% @members.each do |member| %>
+          <div class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-base-300/20 border border-base-content/5">
+            <div class="w-9 h-9 rounded-full overflow-hidden ring-2 ring-base-content/10 shrink-0">
+              <%= image_tag member.traveler.avatar(size: 64),
+                    alt: member.traveler.name,
+                    class: "w-full h-full object-cover",
+                    referrerpolicy: "no-referrer" %>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-base-content truncate"><%= member.traveler.name %></p>
+              <p class="text-xs text-base-content/40 truncate"><%= member.traveler.email.presence || member.role.humanize %></p>
+            </div>
+            <% if member.owner? %>
+              <span class="text-[10px] font-medium text-base-content/30 uppercase tracking-wide shrink-0">Owner</span>
+            <% else %>
+              <%= button_to trip_trip_member_path(@trip, member), method: :delete,
+                    class: "w-7 h-7 rounded-full flex items-center justify-center
+                            text-base-content/30 hover:text-error hover:bg-error/10 transition-colors shrink-0",
+                    data: { turbo_confirm: "Remove #{member.traveler.name} from this trip?" } do %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <%# Add traveler by email %>
+      <div class="flex flex-col gap-2">
+        <p class="dp-label">Add traveller</p>
+        <%= form_with url: trip_trip_members_path(@trip), method: :post,
+              class: "flex gap-2 items-center" do |f| %>
+          <%= f.email_field :email,
+                placeholder: "Email address",
+                class: "flex-1 text-sm text-base-content bg-transparent
+                        border-0 border-b border-base-content/15 rounded-none px-0 pb-2
+                        focus:outline-none focus:border-primary placeholder:text-base-content/25" %>
+          <button type="submit"
+                  class="w-8 h-8 rounded-full bg-primary text-primary-content
+                         hover:opacity-90 transition-opacity flex items-center justify-center shrink-0 shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+          </button>
+        <% end %>
+        <p class="text-xs text-base-content/30 leading-relaxed">
+          If they don't have an account yet, they'll receive an invite email.
+        </p>
+      </div>
+
+    </div>
+
+    <%# ── PERFORATION 2 ── %>
+    <div class="relative flex items-center h-5 shrink-0">
+      <div class="absolute -left-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+      <div class="flex-1 border-t-2 border-dashed border-base-content/15 mx-3"></div>
+      <div class="absolute -right-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+    </div>
+
+    <%# ── BOTTOM: back ── %>
+    <div class="px-5 py-4 shrink-0 flex items-center">
+
+      <%= link_to trip_path(@trip, tab: "trip"),
+            class: "w-12 h-12 rounded-full bg-base-300/80 text-base-content/50
+                    hover:text-base-content hover:bg-base-300 transition-colors
+                    flex items-center justify-center",
+            data: { turbo_direction: "back" } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      <% end %>
+
+    </div>
+
+  </div>
+</div>

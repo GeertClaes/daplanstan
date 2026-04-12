@@ -1,0 +1,68 @@
+<% content_for :main_class, "overflow-y-auto py-8" %>
+
+<div class="max-w-md mx-auto px-4">
+  <div class="bg-base-100 border border-base-content/8 shadow-[0_8px_60px_rgba(0,0,0,0.5)] rounded-3xl">
+
+    <%# ── Header ── %>
+    <div class="px-6 pt-6 pb-4 text-center">
+      <p class="text-[10px] font-mono uppercase tracking-[0.3em] text-base-content/40">New Booking</p>
+    </div>
+
+    <%# ── Perforation ── %>
+    <div class="relative flex items-center h-5">
+      <div class="absolute -left-2.5 w-5 h-5 rounded-full bg-base-100 z-10"></div>
+      <div class="flex-1 border-t-2 border-dashed border-base-content/10 mx-3"></div>
+      <div class="absolute -right-2.5 w-5 h-5 rounded-full bg-base-100 z-10"></div>
+    </div>
+
+    <%= form_with model: @trip do |f| %>
+      <% if @trip.errors.any? %>
+        <div class="px-6 pt-4">
+          <div class="alert alert-error text-sm">
+            <ul><% @trip.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %></ul>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="px-6 pt-5 pb-4 space-y-5" data-controller="date-range">
+
+        <%= f.text_field :title, placeholder: "Trip name",
+              class: "input w-full bg-transparent border-0 border-b border-base-content/10 rounded-none px-0 text-2xl font-bold text-base-content placeholder:text-base-content/25 focus:outline-none focus:border-primary",
+              autofocus: true %>
+
+        <div class="flex gap-4">
+          <div class="flex-1">
+            <p class="text-[10px] font-mono uppercase tracking-widest text-base-content/40 mb-1">Departs</p>
+            <%= f.date_field :start_date,
+                  class: "input w-full bg-transparent border-0 border-b border-base-content/10 rounded-none px-0 text-base-content/70 text-sm focus:outline-none focus:border-primary",
+                  data: { date_range_target: "start", action: "change->date-range#startChanged" } %>
+          </div>
+          <div class="flex-1">
+            <p class="text-[10px] font-mono uppercase tracking-widest text-base-content/40 mb-1">Returns</p>
+            <%= f.date_field :end_date,
+                  class: "input w-full bg-transparent border-0 border-b border-base-content/10 rounded-none px-0 text-base-content/70 text-sm focus:outline-none focus:border-primary",
+                  data: { date_range_target: "end" } %>
+          </div>
+        </div>
+
+        <%= f.text_area :description, placeholder: "Notes or description",
+              rows: 3,
+              class: "textarea w-full bg-transparent border border-base-content/10 rounded-lg text-base-content/70 placeholder:text-base-content/25 text-sm focus:outline-none focus:border-primary resize-none" %>
+
+      </div>
+
+      <%# ── Perforation ── %>
+      <div class="relative flex items-center h-5 mt-2">
+        <div class="absolute -left-2.5 w-5 h-5 rounded-full bg-base-100 z-10"></div>
+        <div class="flex-1 border-t-2 border-dashed border-base-content/10 mx-3"></div>
+        <div class="absolute -right-2.5 w-5 h-5 rounded-full bg-base-100 z-10"></div>
+      </div>
+
+      <div class="px-6 py-5 flex gap-2">
+        <%= f.submit "Create Trip", class: "btn btn-primary flex-1" %>
+        <%= link_to "Cancel", trips_path, class: "btn btn-outline flex-1" %>
+      </div>
+    <% end %>
+
+  </div>
+</div>

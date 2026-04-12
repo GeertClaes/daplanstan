@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>DaPlanStan — Trip planning for people who actually travel</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="description" content="Forward your booking emails. See all your stops on a dark interactive map. Split costs with your crew. DaPlanStan is open-source, self-hosted trip planning.">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0a0f1c">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body data-theme="midnight" class="bg-base-100 text-base-content antialiased">
+
+    <%# Sticky nav — transparent → frosted on scroll %>
+    <header id="landing-nav" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+      <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+
+        <%# Logo %>
+        <%= link_to "/", class: "flex items-center gap-2.5 group" do %>
+          <%= image_tag "logo-mark.svg", class: "h-8 w-8 transition-transform group-hover:scale-105", alt: "DaPlanStan" %>
+          <span class="text-lg font-extrabold tracking-tight">
+            <span class="text-primary">DaPlan</span><span class="text-secondary">Stan</span>
+          </span>
+        <% end %>
+
+        <%# Right slot — e.g. back button on sub-pages %>
+        <% if content_for?(:nav_right) %>
+          <%= yield :nav_right %>
+        <% end %>
+
+      </div>
+    </header>
+
+    <%# Scroll-triggered nav frost %>
+    <script>
+      document.addEventListener("scroll", () => {
+        const nav = document.getElementById("landing-nav")
+        if (window.scrollY > 20) {
+          nav.style.background = "rgba(22, 31, 46, 0.92)"
+          nav.style.backdropFilter = "blur(16px)"
+          nav.style.borderBottom = "1px solid rgba(255,255,255,0.06)"
+        } else {
+          nav.style.background = ""
+          nav.style.backdropFilter = ""
+          nav.style.borderBottom = ""
+        }
+      })
+    </script>
+
+    <%= yield %>
+
+  </body>
+</html>

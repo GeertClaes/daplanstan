@@ -1,0 +1,30 @@
+<div class="max-w-4xl mx-auto p-6">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold"><%= @trip.title %> — Expenses</h1>
+      <div class="flex gap-3 mt-1">
+        <% @total_by_currency.each do |currency, total| %>
+          <span class="badge badge-lg"><%= number_with_precision(total, precision: 2) %> <%= currency %></span>
+        <% end %>
+      </div>
+    </div>
+    <%= link_to "Log Expense", new_trip_expense_path(@trip), class: "btn btn-primary" %>
+  </div>
+
+  <div class="space-y-2">
+    <% @expenses.each do |expense| %>
+      <div class="card bg-base-100 shadow-sm">
+        <div class="card-body py-3">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="font-medium"><%= expense.description %></p>
+              <p class="text-sm text-base-content/60"><%= expense.expense_date.strftime("%b %-d") %> · <%= expense.category.humanize %> · Paid by <%= expense.paid_by.name %></p>
+            </div>
+            <span class="font-mono font-semibold"><%= number_with_precision(expense.amount, precision: 2) %> <%= expense.currency %></span>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <%== series_nav(@pagy) if @pagy.pages > 1 %>
+</div>

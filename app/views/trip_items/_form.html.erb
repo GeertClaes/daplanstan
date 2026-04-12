@@ -1,0 +1,158 @@
+<%# Hide global navbar — the card IS the screen %>
+<% content_for :hide_navbar, true %>
+<% content_for :main_class, "flex flex-col overflow-hidden" %>
+
+<%= form_with model: [@trip, item],
+      class: "flex-1 flex flex-col overflow-hidden" do |f| %>
+
+  <%# ── Spacer (h-14 = 56px — matches nav band on show so cards are identical size) ── %>
+  <div class="h-14 shrink-0 max-w-sm mx-auto w-full px-4 flex items-center justify-between">
+    <div class="flex gap-2 flex-wrap">
+      <% item.errors.full_messages.each do |msg| %>
+        <span class="text-xs text-error font-medium"><%= msg %></span>
+      <% end %>
+    </div>
+    <span class="flex items-center gap-1.5 bg-base-300/70 backdrop-blur-sm text-base-content/50 px-3 py-1.5 rounded-full text-xs font-medium shrink-0">
+      <%= trip_item_kind_icon(item.kind, css_class: "h-3.5 w-3.5") %>
+      Itinerary
+    </span>
+  </div>
+
+  <%# ── Card ── %>
+  <div class="flex-1 min-h-0 px-4 pb-4">
+    <div class="max-w-sm mx-auto h-full bg-base-200 border border-base-content/10 rounded-3xl
+                overflow-visible flex flex-col">
+
+      <%# ── TOP SECTION: kind icon + name ── %>
+      <div class="px-6 pt-5 pb-4 shrink-0 flex items-center gap-3">
+        <div class="shrink-0 w-11 h-11 rounded-xl bg-primary/15 text-primary flex items-center justify-center">
+          <%= trip_item_kind_icon(item.kind.presence || "activity", css_class: "h-7 w-7") %>
+        </div>
+        <%= f.text_field :name, placeholder: "What is it?",
+              class: "flex-1 text-xl font-bold text-base-content bg-transparent
+                      border-0 border-b border-base-content/15 rounded-none px-0 pb-1
+                      focus:outline-none focus:border-primary placeholder:text-base-content/25",
+              autofocus: item.new_record? %>
+      </div>
+
+      <%# ── PERFORATION 1 ── %>
+      <div class="relative flex items-center h-5 shrink-0">
+        <div class="absolute -left-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+        <div class="flex-1 border-t-2 border-dashed border-base-content/15 mx-3"></div>
+        <div class="absolute -right-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+      </div>
+
+      <%# ── MIDDLE SECTION ── %>
+      <div class="flex-1 min-h-0 overflow-y-auto px-5 py-4 flex flex-col gap-4">
+
+        <%# Kind picker %>
+        <div class="pt-1">
+          <%= render "kind_picker", selected: item.kind, mode: :form %>
+        </div>
+
+        <%# When + Until %>
+        <div class="flex flex-col gap-2">
+          <p class="dp-label">When</p>
+          <%= f.datetime_field :starts_at,
+                class: "w-full text-sm text-base-content/70 bg-transparent
+                        border-0 border-b border-base-content/15 rounded-none px-0 pb-2
+                        focus:outline-none focus:border-primary" %>
+          <p class="dp-label mt-1">Until <span class="font-normal normal-case text-base-content/30">(optional)</span></p>
+          <%= f.datetime_field :ends_at,
+                class: "w-full text-sm text-base-content/50 bg-transparent
+                        border-0 border-b border-base-content/10 rounded-none px-0 pb-2
+                        focus:outline-none focus:border-primary" %>
+        </div>
+
+        <%# Address %>
+        <%= f.text_field :address, placeholder: "Address (optional)",
+              class: "w-full text-sm text-base-content bg-transparent
+                      border-0 border-b border-base-content/15 rounded-none px-0 pb-2
+                      focus:outline-none focus:border-primary placeholder:text-base-content/25" %>
+
+        <%# Amount + Currency %>
+        <div class="flex items-end gap-3">
+          <%= f.number_field :amount, step: "0.01", placeholder: "Amount (optional)",
+                value: item.amount.present? ? "%.2f" % item.amount : nil,
+                class: "w-0 flex-1 text-sm text-base-content/70 bg-transparent
+                        border-0 border-b border-base-content/15 rounded-none px-0 pb-2
+                        focus:outline-none focus:border-primary placeholder:text-base-content/25" %>
+          <%= f.select :currency,
+                ExpensesHelper::COMMON_CURRENCIES.map { |c| [c, c] },
+                { selected: item.currency.presence || "EUR" },
+                class: "shrink-0 w-20 text-sm font-mono text-base-content/60 bg-transparent
+                        border-0 border-b border-base-content/15 rounded-none pb-1.5 mb-0.5
+                        focus:outline-none focus:border-primary appearance-none cursor-pointer" %>
+        </div>
+
+        <%# Confirmation ref %>
+        <%= f.text_field :confirmation_ref, placeholder: "Booking ref (optional)",
+              class: "w-full text-sm text-base-content/70 bg-transparent
+                      border-0 border-b border-base-content/15 rounded-none px-0 pb-2
+                      focus:outline-none focus:border-primary placeholder:text-base-content/25" %>
+
+        <%# Notes %>
+        <%= f.text_area :notes, placeholder: "Notes (optional)", rows: 2,
+              class: "w-full text-sm text-base-content/70 bg-transparent
+                      border-0 border-b border-base-content/15 rounded-none px-0 pb-2
+                      focus:outline-none focus:border-primary placeholder:text-base-content/25 resize-none" %>
+
+        <%# Status toggle — Idea / Confirmed %>
+        <div class="flex items-center justify-between pt-1">
+          <p class="dp-label">Status</p>
+          <div class="flex items-center gap-0.5 bg-base-300/50 rounded-full p-0.5">
+            <%= f.radio_button :status, "idea", id: "status_idea", class: "sr-only peer/idea" %>
+            <label for="status_idea"
+                   class="px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-colors
+                          text-base-content/40 hover:text-base-content
+                          peer-checked/idea:bg-warning/25 peer-checked/idea:text-warning">
+              Idea
+            </label>
+            <%= f.radio_button :status, "confirmed", id: "status_confirmed", class: "sr-only peer/confirmed" %>
+            <label for="status_confirmed"
+                   class="px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-colors
+                          text-base-content/40 hover:text-base-content
+                          peer-checked/confirmed:bg-success/25 peer-checked/confirmed:text-success">
+              Confirmed
+            </label>
+          </div>
+        </div>
+
+      </div>
+
+      <%# ── PERFORATION 2 ── %>
+      <div class="relative flex items-center h-5 shrink-0">
+        <div class="absolute -left-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+        <div class="flex-1 border-t-2 border-dashed border-base-content/15 mx-3"></div>
+        <div class="absolute -right-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+      </div>
+
+      <%# ── BOTTOM SECTION: cancel + save ── %>
+      <div class="px-5 py-4 shrink-0 flex items-center justify-between">
+
+        <%# Cancel — grey X circle %>
+        <%= link_to (item.new_record? ? trip_path(@trip, tab: "itinerary") : trip_trip_item_path(@trip, item)),
+              class: "w-12 h-12 rounded-full bg-base-300/80 text-base-content/50
+                      hover:text-base-content hover:bg-base-300 transition-colors
+                      flex items-center justify-center",
+              data: { turbo_direction: "back" } do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        <% end %>
+
+        <%# Save — teal checkmark circle %>
+        <%= f.button type: "submit",
+              class: "w-12 h-12 rounded-full bg-primary text-primary-content
+                      hover:opacity-90 transition-opacity flex items-center justify-center shadow-lg" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+          </svg>
+        <% end %>
+
+      </div>
+
+    </div>
+  </div>
+
+<% end %>

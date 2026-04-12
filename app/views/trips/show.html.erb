@@ -1,0 +1,176 @@
+<%= render "trips/navbar_center" %>
+<%= turbo_stream_from @trip %>
+
+<%# Prevent Turbo caching so panel state is always fresh %>
+<% content_for :head do %>
+  <meta name="turbo-cache-control" content="no-cache">
+  <meta name="turbo-refresh-method" content="morph">
+  <meta name="turbo-refresh-scroll" content="preserve">
+<% end %>
+
+<%# Full-height layout — no padding %>
+<% content_for :main_class, "flex flex-col overflow-hidden min-h-0" %>
+
+<% current_member = current_member_for(@trip) %>
+
+<div data-controller="trip-nav pull-to-refresh" class="flex-1 flex flex-col min-h-0">
+
+  <%= render "trips/tab_bar" %>
+
+  <%# ════════════════════════════
+      PANEL CONTAINER
+  ════════════════════════════ %>
+  <div id="trip-panels" data-turbo-permanent class="flex-1 relative min-h-0">
+
+    <%# ─────────────────────────────────────────────────────
+        ITINERARY PANEL  —  map + stops list
+        Desktop: map left (flex-1) | sidebar right (420px)
+        Mobile:  map top (42vh) | list bottom (flex-1)
+    ───────────────────────────────────────────────────── %>
+    <div data-trip-nav-target="panel" data-tab="itinerary"
+         class="absolute inset-0 flex flex-col sm:flex-row" style="display:none">
+
+      <%# Map — isolate creates a stacking context so Leaflet's internal z-indexes
+          (panes at 200-700) don't escape and fight with the navbar dropdown %>
+      <div class="relative h-[42vh] sm:h-auto sm:flex-1 shrink-0 isolate">
+        <div data-controller="map"
+             data-map-trip-items-value="<%= @map_trip_items_json %>"
+             data-turbo-permanent
+             class="absolute inset-0"
+             id="trip-map"></div>
+      </div>
+
+      <%# Desktop sidebar %>
+      <div class="hidden sm:flex flex-col w-[420px] border-l border-base-200 bg-base-100 overflow-y-auto">
+        <%= render "timeline", trip_items: @trip_items, trip: @trip %>
+      </div>
+
+      <%# Mobile list %>
+      <div class="sm:hidden flex-1 overflow-y-auto bg-base-100 border-t border-base-200">
+        <%= render "timeline", trip_items: @trip_items, trip: @trip %>
+      </div>
+
+      <%# FAB: Add Stop — icon-only circle %>
+      <div class="absolute bottom-6 right-5 z-20 pointer-events-none">
+        <%= link_to new_trip_trip_item_path(@trip),
+              class: "pointer-events-auto w-14 h-14 rounded-full bg-primary text-primary-content
+                      shadow-xl shadow-primary/30 flex items-center justify-center
+                      hover:opacity-90 transition-opacity" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+          </svg>
+        <% end %>
+      </div>
+
+    </div>
+
+    <%# ─────────────────────────────────────────────────────
+        EXPENSES PANEL  —  budget summary + expense list
+    ───────────────────────────────────────────────────── %>
+    <%# Panel uses flex-col so the FAB overlay sits outside the scroll area %>
+    <div data-trip-nav-target="panel" data-tab="expenses"
+         class="absolute inset-0 flex flex-col overflow-hidden" style="display:none">
+
+      <%# ── Scrollable content — overflow-x-hidden prevents horizontal drag ── %>
+      <div class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
+        <div class="max-w-2xl mx-auto pb-24">
+
+          <%# ── Budget summary ── %>
+          <% exp_by_currency = @expenses.group_by(&:currency) %>
+          <% if exp_by_currency.any? %>
+            <div class="px-5 pt-6 pb-4 space-y-5">
+              <% exp_by_currency.each do |currency, exps| %>
+                <% total     = exps.sum(&:amount) %>
+                <% paid_amt  = exps.select(&:confirmed?).sum(&:amount) %>
+                <% to_settle = total - paid_amt %>
+                <% pct       = total > 0 ? (paid_amt / total * 100).round : 0 %>
+                <div>
+                  <div class="flex items-start justify-between mb-3">
+                    <div>
+                      <p class="text-4xl font-bold font-mono text-base-content leading-none">
+                        <%= number_with_precision(total, precision: 2) %>
+                        <span class="text-xl text-base-content/40 font-sans font-normal ml-1"><%= currency %></span>
+                      </p>
+                      <p class="text-xs text-base-content/40 mt-1.5">
+                        <%= exps.size %> expense<%= exps.size == 1 ? "" : "s" %>
+                      </p>
+                    </div>
+                    <div class="text-right shrink-0 ml-4">
+                      <p class="text-sm font-semibold text-success"><%= number_with_precision(paid_amt, precision: 2) %> paid</p>
+                      <p class="text-sm font-semibold <%= to_settle > 0 ? "text-accent" : "text-success" %> mt-0.5">
+                        <%= number_with_precision(to_settle, precision: 2) %> to settle
+                      </p>
+                    </div>
+                  </div>
+                  <div class="w-full h-1.5 bg-base-content/10 rounded-full overflow-hidden">
+                    <div class="h-full bg-success rounded-full transition-all" style="width: <%= pct %>%"></div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+            <div class="dp-perforation"><span></span></div>
+          <% end %>
+
+          <%# ── Expense list ── %>
+          <% if @expenses.empty? %>
+            <div class="mx-4 mt-6 dp-card flex flex-col items-center justify-center py-16 px-4 text-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-base-content/20 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>
+              </svg>
+              <p class="text-sm text-base-content/40">No expenses yet</p>
+              <p class="text-xs text-base-content/25 mt-1">Tap + to add one</p>
+            </div>
+          <% else %>
+            <div>
+              <% @expenses.sort_by { |e| [-e.expense_date.to_time.to_i, e.created_at.to_i] }.each do |expense| %>
+                <%= render "expenses/expense_row", expense: expense, trip: @trip %>
+              <% end %>
+            </div>
+          <% end %>
+
+        </div>
+      </div>
+
+      <%# ── FAB overlay — pointer-events-none so scroll still works beneath ── %>
+      <%# FABs are absolute within the panel (not within the scroll area),    %>
+      <%# so they stay fixed at the bottom regardless of scroll position.      %>
+      <div class="absolute inset-0 pointer-events-none z-20">
+        <div class="absolute bottom-6 left-5 pointer-events-auto">
+          <button class="w-12 h-12 rounded-full bg-base-300/80 backdrop-blur-sm text-base-content/50
+                         hover:text-base-content hover:bg-base-300 transition-colors
+                         flex items-center justify-center shadow-lg"
+                  title="Filter expenses" disabled>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M7 10h10M11 16h2"/>
+            </svg>
+          </button>
+        </div>
+        <div class="absolute bottom-6 right-5 pointer-events-auto">
+          <%= link_to new_trip_expense_path(@trip),
+                class: "w-14 h-14 rounded-full bg-primary text-primary-content shadow-xl shadow-primary/30
+                        flex items-center justify-center hover:opacity-90 transition-opacity",
+                data: { turbo_direction: "forward" } do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+          <% end %>
+        </div>
+      </div>
+
+    </div>
+
+    <%# ─────────────────────────────────────────────────────
+        TRIP PANEL  —  boarding-pass card with trip details
+    ───────────────────────────────────────────────────── %>
+    <div data-trip-nav-target="panel" data-tab="trip"
+         class="absolute inset-0 flex flex-col overflow-hidden" style="display:none">
+      <div class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
+        <%= render "trips/trip_panel", current_member: current_member %>
+      </div>
+    </div>
+
+  </div><%# end panel container %>
+
+  <%= render "trips/bottom_nav" %>
+
+</div>

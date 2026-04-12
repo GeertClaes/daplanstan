@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="stan">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DaPlanStan — Trip planning for people who actually travel</title>
+  <meta name="description" content="Self-hosted, open source trip planning built with Ruby on Rails 8. Forward booking emails, pin places on a map, track what you spend. Free to self-host. $50/yr hosted." />
+
+  <!-- Favicons -->
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon-96x96.png" type="image/png" sizes="96x96" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://daplanstan.com/" />
+  <meta property="og:title"       content="DaPlanStan — Trip planning for people who actually travel" />
+  <meta property="og:description" content="Forward your booking confirmations. Pin places on a map. Track expenses. One shared space for your whole travel group. Open source, self-hosted, built on Rails 8." />
+  <meta property="og:image"       content="https://daplanstan.com/icon-512.png" />
+  <meta property="og:image:width"  content="512" />
+  <meta property="og:image:height" content="512" />
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card"        content="summary" />
+  <meta name="twitter:title"       content="DaPlanStan — Trip planning for people who actually travel" />
+  <meta name="twitter:description" content="Forward your booking confirmations. Pin places on a map. Track expenses. Open source, self-hosted, built on Rails 8." />
+  <meta name="twitter:image"       content="https://daplanstan.com/icon-512.png" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://daplanstan.com/" />
+
+  <!-- DaisyUI + Tailwind via CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5/daisyui.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* ── Stan theme — keep in sync with app/assets/tailwind/application.css ── */
+    [data-theme="stan"] {
+      color-scheme: dark;
+      --color-base-100: oklch(20% 0.030 263);
+      --color-base-200: oklch(26% 0.036 261);
+      --color-base-300: oklch(34% 0.042 259);
+      --color-base-content: oklch(93% 0.010 255);
+      --color-primary: oklch(74% 0.155 175);
+      --color-primary-content: oklch(14% 0.020 260);
+      --color-secondary: oklch(68% 0.180 18);
+      --color-secondary-content: oklch(98% 0 0);
+      --color-accent: oklch(82% 0.165 88);
+      --color-accent-content: oklch(14% 0.020 260);
+      --color-neutral: oklch(10% 0.020 265);
+      --color-neutral-content: oklch(62% 0.018 250);
+      --color-info: oklch(72% 0.140 220);
+      --color-info-content: oklch(10% 0 0);
+      --color-success: oklch(72% 0.195 145);
+      --color-success-content: oklch(10% 0 0);
+      --color-warning: oklch(78% 0.175 70);
+      --color-warning-content: oklch(10% 0 0);
+      --color-error: var(--color-secondary);
+      --color-error-content: oklch(98% 0 0);
+      --radius-box: 1.5rem;
+      --radius-field: 0.75rem;
+    }
+
+    /* ── Fix DaisyUI CDN not picking up primary-content var ── */
+    [data-theme="stan"] .btn-primary,
+    [data-theme="stan"] .btn-primary:hover {
+      color: oklch(14% 0.020 260);
+    }
+
+    /* ── Community themes (keep in sync with application.css) ── */
+    [data-theme="sand"] {
+      color-scheme: light;
+      --color-base-100: oklch(97% 0.010 85);
+      --color-base-200: oklch(93% 0.015 80);
+      --color-base-300: oklch(86% 0.022 76);
+      --color-base-content: oklch(20% 0.024 255);
+      --color-primary: oklch(50% 0.155 175);
+      --color-primary-content: oklch(98% 0 0);
+      --color-secondary: oklch(54% 0.180 18);
+      --color-secondary-content: oklch(98% 0 0);
+      --color-accent: oklch(52% 0.165 72);
+      --color-accent-content: oklch(98% 0 0);
+      --color-neutral: oklch(28% 0.012 255);
+      --color-neutral-content: oklch(60% 0.016 255);
+      --color-info: oklch(50% 0.140 220);
+      --color-info-content: oklch(98% 0 0);
+      --color-success: oklch(46% 0.185 145);
+      --color-success-content: oklch(98% 0 0);
+      --color-warning: oklch(54% 0.168 65);
+      --color-warning-content: oklch(10% 0 0);
+      --color-error: oklch(53% 0.220 18);
+      --color-error-content: oklch(98% 0 0);
+      --radius-box: 1.5rem;
+      --radius-field: 0.75rem;
+    }
+    [data-theme="gruvbox"] {
+      color-scheme: dark;
+      --color-base-100: #282828;
+      --color-base-200: #1d2021;
+      --color-base-300: #3c3836;
+      --color-base-content: #fbf1c7;
+      --color-primary: #458588;
+      --color-primary-content: oklch(97% 0.014 254.604);
+      --color-secondary: #b16286;
+      --color-secondary-content: oklch(98% 0.001 106.423);
+      --color-accent: #d3869b;
+      --color-accent-content: oklch(97% 0.014 254.604);
+      --color-neutral: #d65d0e;
+      --color-neutral-content: oklch(98% 0.026 102.212);
+      --color-info: #83a598;
+      --color-info-content: oklch(29% 0.066 243.157);
+      --color-success: oklch(76% 0.177 163.223);
+      --color-success-content: oklch(26% 0.051 172.552);
+      --color-warning: #fabd2f;
+      --color-warning-content: oklch(28% 0.066 53.813);
+      --color-error: #fb4954;
+      --color-error-content: oklch(25% 0.092 26.042);
+      --radius-box: 1.5rem;
+      --radius-field: 0.75rem;
+    }
+    [data-theme="rosepine"] {
+      color-scheme: dark;
+      --color-base-100: #191724;
+      --color-base-200: #1f1d2e;
+      --color-base-300: #26233a;
+      --color-base-content: #e0def4;
+      --color-primary: #eb6f92;
+      --color-primary-content: oklch(44% 0.177 26.899);
+      --color-secondary: #ebbcba;
+      --color-secondary-content: oklch(94% 0.028 342.258);
+      --color-accent: rgb(217 0 105);
+      --color-accent-content: oklch(38% 0.063 188.416);
+      --color-neutral: #31748f;
+      --color-neutral-content: oklch(92% 0.004 286.32);
+      --color-info: #56949f;
+      --color-info-content: oklch(29% 0.066 243.157);
+      --color-success: #9ccfd8;
+      --color-success-content: oklch(37% 0.077 168.94);
+      --color-warning: #f6c177;
+      --color-warning-content: oklch(41% 0.112 45.904);
+      --color-error: rgb(219 75 75);
+      --color-error-content: oklch(27% 0.105 12.094);
+      --radius-box: 1.5rem;
+      --radius-field: 0.75rem;
+    }
+    [data-theme="solarized"] {
+      color-scheme: dark;
+      --color-base-100: #002b36;
+      --color-base-200: #073642;
+      --color-base-300: #586e75;
+      --color-base-content: #eee8d5;
+      --color-primary: #268bd2;
+      --color-primary-content: oklch(96% 0.018 272.314);
+      --color-secondary: #d33682;
+      --color-secondary-content: oklch(94% 0.028 342.258);
+      --color-accent: #2aa198;
+      --color-accent-content: oklch(38% 0.063 188.416);
+      --color-neutral: #073642;
+      --color-neutral-content: oklch(92% 0.004 286.32);
+      --color-info: #268bd2;
+      --color-info-content: oklch(29% 0.066 243.157);
+      --color-success: #859900;
+      --color-success-content: oklch(37% 0.077 168.94);
+      --color-warning: #b58900;
+      --color-warning-content: oklch(41% 0.112 45.904);
+      --color-error: #dc322f;
+      --color-error-content: oklch(27% 0.105 12.094);
+      --radius-box: 1.5rem;
+      --radius-field: 0.75rem;
+    }
+
+    /* ── Smooth scroll ─────────────────────────────────────── */
+    html { scroll-behavior: smooth; }
+
+    /* ── Nav frost on scroll ──────────────────────────────── */
+    .nav-frosted {
+      background: oklch(26% 0.036 261 / 0.92) !important;
+      backdrop-filter: blur(16px) !important;
+      border-bottom: 1px solid oklch(93% 0.010 255 / 0.06) !important;
+    }
+
+    /* ── Phone frame ──────────────────────────────────────── */
+    .phone-frame {
+      border: 3px solid var(--color-base-content, oklch(93% 0.010 255)) ;
+      border-color: color-mix(in oklch, var(--color-base-content) 15%, transparent);
+      border-radius: 2.5rem;
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
+      background: var(--color-base-300);
+    }
+    .phone-frame::before {
+      content: "";
+      display: block;
+      width: 40%;
+      height: 6px;
+      background: color-mix(in oklch, var(--color-base-content) 15%, transparent);
+      border-radius: 3px;
+      margin: 14px auto 0;
+    }
+    /* phone mockup inner wrapper */
+
+    /* ── Section label ─────────────────────────────────────── */
+    .section-label {
+      font-size: 0.625rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: oklch(74% 0.155 175);
+    }
+
+    /* ── Gradient separator ────────────────────────────────── */
+    .gradient-sep {
+      height: 1px;
+      background: linear-gradient(to right, transparent, oklch(74% 0.155 175 / 0.3), transparent);
+    }
+
+    /* ── Hero background ───────────────────────────────────── */
+    .hero-bg {
+      background:
+        radial-gradient(ellipse 70% 55% at 65% 45%, oklch(74% 0.155 175 / 0.13) 0%, transparent 65%),
+        radial-gradient(ellipse 45% 40% at 15% 85%, oklch(68% 0.180 18 / 0.09) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 50% at 90% 10%, oklch(74% 0.155 175 / 0.07) 0%, transparent 60%);
+    }
+    .hero-bg::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(oklch(94% 0.012 200 / 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, oklch(94% 0.012 200 / 0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+
+    /* ── Base font size ────────────────────────────────────── */
+    body { font-size: 1.0625rem; }
+
+    /* ── Clickable screenshots ─────────────────────────────── */
+    img[data-screen] { cursor: zoom-in; }
+  </style>
+</head>
+
+<body class="bg-base-100 text-base-content antialiased">
+
+  <!-- ══════════════════════════════════════
+       STICKY NAV
+  ════════════════════════════════════════ -->
+  <header id="site-nav" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-2.5 group">
+        <svg class="h-8 w-8 shrink-0" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="DaPlanStan">
+          <path d="M466.763 970.011H164.515C147.171 970.011 130.789 961.681 120.832 947.585C110.875 933.489 108.305 915.389 113.926 899.05L209.483 625.781C210.928 621.616 213.016 617.932 215.265 614.248C248.348 640.197 456.645 810.15 466.763 970.011Z" fill="var(--color-primary)"/>
+          <path d="M693.716 806.872L464.715 851.934C450.792 823.909 433.509 796.681 414.626 771.204L570.814 710.855L693.716 806.872Z" fill="var(--color-primary)"/>
+          <path d="M782.655 593.401L567.971 677.119C584.596 657.072 608.734 626.599 633.031 589.712H763.313C770.027 589.712 776.581 590.995 782.655 593.401Z" fill="var(--color-primary)"/>
+          <path d="M726.739 833.532L888.466 960.422C879.65 966.335 869.392 970.01 858.493 970.01H497.694C496.091 940.765 488.718 911.36 477.498 882.754L726.739 833.532Z" fill="var(--color-primary)"/>
+          <path d="M909.565 934.741L606.308 696.711L810.938 617.314C812.382 619.876 813.664 622.597 814.627 625.478L910.046 898.564C914.216 910.41 913.895 923.216 909.565 934.741Z" fill="var(--color-primary)"/>
+          <path d="M486.698 708.838L394.65 744.592C335.797 671.481 268.926 615.044 241.344 593.239C247.277 590.995 253.692 589.712 260.266 589.712H390.962C430.09 648.714 468.577 691.843 477.076 701.142C479.962 704.188 483.33 706.593 486.698 708.838Z" fill="var(--color-primary)"/>
+          <path d="M512.767 677.119C518.11 677.119 523.263 674.823 526.889 670.996C535.095 662.004 728.985 447.905 728.985 269.968C728.985 150.387 632.04 53 512.767 53C393.494 53 296.549 150.387 296.549 269.968C296.549 447.905 490.439 662.004 498.645 670.996C502.271 674.823 507.424 677.119 512.767 677.119Z" fill="var(--color-secondary)"/>
+          <path d="M512.766 414.897C592.376 414.897 656.912 350.361 656.912 270.751C656.912 191.142 592.376 126.606 512.766 126.606C433.157 126.606 368.621 191.142 368.621 270.751C368.621 350.361 433.157 414.897 512.766 414.897Z" fill="white"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M441.624 230.259C438.817 230.259 435.971 231.634 434.279 234.613L409.288 278.678C405.512 285.954 416.116 292.115 421.292 284.057L438.084 260.34L433.427 289.033L426.877 349.312C427.265 357.034 442.091 356.995 442.985 349.312L452.27 309.973C452.429 308.732 453.27 307.674 454.57 307.674C455.858 307.674 456.71 308.732 456.855 309.973L461.498 349.312C462.408 356.995 477.217 357.034 477.611 349.312L475.701 293.69L480.344 246.051H488.355L492.506 254.018V289.03L485.956 349.309C486.344 357.031 501.153 356.992 502.064 349.309L511.35 305.333C511.494 304.075 512.349 303.031 513.635 303.031C514.937 303.031 515.778 304.075 515.923 305.333L525.22 349.309C526.119 356.992 540.928 357.031 541.333 349.309L534.763 289.036V254.02L538.929 246.054H546.537L551.18 293.692L549.269 349.314C549.661 357.037 564.472 356.998 565.383 349.314L570.026 309.976C570.17 308.734 571.023 307.676 572.325 307.676C573.614 307.676 574.449 308.734 574.594 309.976L583.893 349.314C584.804 356.998 599.599 357.037 600.007 349.314L593.437 289.036L588.794 260.343L605.586 284.06C610.764 292.115 621.366 285.956 617.593 278.681L592.601 234.616C590.91 231.637 588.045 230.262 585.237 230.262H581.769C577.704 232.72 572.817 234.138 567.666 234.138C562.52 234.138 557.628 232.72 553.568 230.262H527.735C523.67 232.72 518.797 234.138 513.632 234.138C508.487 234.138 503.611 232.72 499.548 230.262H473.299C469.248 232.72 464.347 234.138 459.196 234.138C454.05 234.138 449.174 232.72 445.112 230.262H441.624V230.259Z" fill="var(--color-secondary-content)"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M459.212 187.945C470.161 187.945 478.983 195.479 478.983 204.837V211.748C478.983 221.109 470.161 228.642 459.212 228.642C448.25 228.642 439.428 221.109 439.428 211.748V204.837C439.425 195.482 448.25 187.945 459.212 187.945Z" fill="var(--color-secondary-content)"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M567.666 187.945C556.717 187.945 547.896 195.479 547.896 204.837V211.748C547.896 221.109 556.717 228.642 567.666 228.642C578.629 228.642 587.451 221.109 587.451 211.748V204.837C587.451 195.482 578.629 187.945 567.666 187.945Z" fill="var(--color-secondary-content)"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M513.634 187.945C524.597 187.945 533.419 195.479 533.419 204.837V211.748C533.419 221.109 524.597 228.642 513.634 228.642C502.685 228.642 493.866 221.109 493.866 211.748V204.837C493.869 195.482 502.688 187.945 513.634 187.945Z" fill="var(--color-secondary-content)"/>
+        </svg>
+        <span class="text-lg font-extrabold tracking-tight">
+          <span class="text-primary">DaPlan</span><span class="text-secondary">Stan</span>
+        </span>
+      </a>
+
+      <!-- Nav links -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-base-content/60">
+        <a href="#features" class="hover:text-primary transition-colors">Features</a>
+        <a href="#how-it-works" class="hover:text-primary transition-colors">How it works</a>
+        <a href="#open-source" class="hover:text-primary transition-colors">Open source</a>
+        <a href="#pricing" class="hover:text-primary transition-colors">Pricing</a>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <a href="https://github.com/GeertClaes/daplanstan" target="_blank" rel="noopener"
+           class="btn btn-sm btn-outline border-base-content/20 text-base-content/70 hover:bg-primary hover:text-primary-content hover:border-primary">
+          <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          <span class="hidden sm:inline">GitHub</span>
+        </a>
+        <!-- Hamburger (mobile only) -->
+        <button id="mobile-menu-btn" class="md:hidden p-2 -mr-2 text-base-content/60 hover:text-primary transition-colors" aria-label="Open menu">
+          <svg id="icon-open" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          <svg id="icon-close" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile menu overlay -->
+  <div id="mobile-menu" class="hidden fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 md:hidden"
+       style="background: oklch(20% 0.030 263 / 0.97); backdrop-filter: blur(12px);">
+    <a href="#features"     onclick="closeMobileMenu()" class="text-2xl font-bold hover:text-primary transition-colors">Features</a>
+    <a href="#how-it-works" onclick="closeMobileMenu()" class="text-2xl font-bold hover:text-primary transition-colors">How it works</a>
+    <a href="#open-source"  onclick="closeMobileMenu()" class="text-2xl font-bold hover:text-primary transition-colors">Open source</a>
+    <a href="#pricing"      onclick="closeMobileMenu()" class="text-2xl font-bold hover:text-primary transition-colors">Pricing</a>
+    <a href="#interest"     onclick="closeMobileMenu()" class="btn btn-primary btn-lg mt-4">Get early access</a>
+  </div>
+
+  <script>
+    document.addEventListener("scroll", () => {
+      const nav = document.getElementById("site-nav")
+      nav.classList.toggle("nav-frosted", window.scrollY > 20)
+    })
+    const btn = document.getElementById("mobile-menu-btn")
+    const menu = document.getElementById("mobile-menu")
+    const iconOpen = document.getElementById("icon-open")
+    const iconClose = document.getElementById("icon-close")
+    btn.addEventListener("click", () => {
+      const isOpen = !menu.classList.contains("hidden")
+      menu.classList.toggle("hidden", isOpen)
+      iconOpen.classList.toggle("hidden", !isOpen)
+      iconClose.classList.toggle("hidden", isOpen)
+      document.body.style.overflow = isOpen ? "" : "hidden"
+    })
+    function closeMobileMenu() {
+      menu.classList.add("hidden")
+      iconOpen.classList.remove("hidden")
+      iconClose.classList.add("hidden")
+      document.body.style.overflow = ""
+    }
+
+    // ── Theme switcher ───────────────────────────────────────
+    document.addEventListener("DOMContentLoaded", () => {
+    const themes = [
+      { id: "stan",      label: "Stan",      base: "#141f32", primary: "#3ecfb2", secondary: "#e0574a" },
+      { id: "sand",      label: "Sand",      base: "#f5f0e4", primary: "#2da090", secondary: "#b84040" },
+      { id: "gruvbox",   label: "Gruvbox",   base: "#282828", primary: "#458588", secondary: "#b16286" },
+      { id: "rosepine",  label: "Rose Pine", base: "#191724", primary: "#eb6f92", secondary: "#ebbcba" },
+      { id: "solarized", label: "Solarized", base: "#002b36", primary: "#268bd2", secondary: "#d33682" },
+    ]
+    const root = document.documentElement
+    const switcher = document.getElementById("theme-switcher")
+    let activeTheme = "stan"
+
+    themes.forEach(t => {
+      const btn = document.createElement("button")
+      btn.dataset.themeId = t.id
+      btn.title = t.label
+      btn.className = "flex items-center gap-2 px-3 py-2 rounded-2xl border transition-all duration-200 text-sm font-semibold cursor-pointer " +
+        "border-base-content/10 bg-base-200 hover:border-primary/50 hover:bg-base-300 text-base-content/70"
+      btn.innerHTML =
+        `<span class="flex gap-1">` +
+        `<span class="w-3 h-3 rounded-full" style="background:${t.base};border:1px solid rgba(255,255,255,0.15)"></span>` +
+        `<span class="w-3 h-3 rounded-full" style="background:${t.primary}"></span>` +
+        `<span class="w-3 h-3 rounded-full" style="background:${t.secondary}"></span>` +
+        `</span>` +
+        `<span>${t.label}</span>`
+      btn.addEventListener("click", () => {
+        activeTheme = t.id
+        root.setAttribute("data-theme", t.id)
+        // Swap all themed screenshots
+        document.querySelectorAll("img[data-screen]").forEach(img => {
+          img.src = "screenshots-webp/" + t.id + "/" + img.dataset.screen
+        })
+        switcher.querySelectorAll("button").forEach(b => {
+          const active = b.dataset.themeId === t.id
+          b.classList.toggle("border-primary", active)
+          b.classList.toggle("bg-base-300", active)
+          b.classList.toggle("text-base-content", active)
+          b.classList.toggle("border-base-content/10", !active)
+          b.classList.toggle("bg-base-200", !active)
+          b.classList.toggle("text-base-content/70", !active)
+        })
+      })
+      switcher.appendChild(btn)
+    })
+
+    // mark Stan as active on load
+    switcher.querySelector("[data-theme-id='stan']").click()
+    }) // end DOMContentLoaded
+  </script>
+
+
+  <!-- ══════════════════════════════════════
+       SECTION 1 — HERO
+  ════════════════════════════════════════ -->
+  <section class="min-h-screen flex items-center pt-24 pb-16 px-6 relative overflow-hidden hero-bg">
+    <div class="max-w-6xl mx-auto w-full grid md:grid-cols-2 gap-12 items-center">
+
+      <!-- Left: copy -->
+      <div>
+        <div class="flex items-center gap-2 mb-6">
+          <span class="badge badge-sm border-primary/30 text-primary bg-primary/10 font-semibold tracking-wide">
+            Open source · Self-hosted · Ruby on Rails 8
+          </span>
+        </div>
+
+        <p class="text-2xl md:text-3xl font-bold text-secondary mb-4">What's the plan, Stan?</p>
+        <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight mb-6">
+          Trip planning<br />
+          for families &amp; friends<br />
+          <span class="text-primary">who actually travel.</span>
+        </h1>
+
+        <p class="text-base-content/60 text-lg leading-relaxed mb-8 max-w-md">
+          One shared space for your whole travel group — partners, kids, friends, whoever's coming.
+          Forward booking emails, pin places on the map, and keep everyone's spending in one place.
+        </p>
+
+        <!-- Feature pills -->
+        <div class="flex flex-wrap gap-2 mb-10">
+          <span class="badge badge-outline border-primary/30 text-primary/80 gap-1.5 py-3 px-3">
+            <svg class="h-3.5 w-3.5" viewBox="0 0 48 48" fill="none"><path d="M41.0625 9H6.9375C4.76285 9 3 10.7349 3 12.875V36.125C3 38.2651 4.76285 40 6.9375 40H41.0625C43.2371 40 45 38.2651 45 36.125V12.875C45 10.7349 43.2371 9 41.0625 9ZM41.0625 12.875V16.1692C39.2232 17.6432 36.2909 19.9353 30.0222 24.766C28.6407 25.8354 25.9041 28.4046 24 28.3747C22.0962 28.405 19.3588 25.835 17.9778 24.766C11.7101 19.936 8.77705 17.6434 6.9375 16.1692V12.875H41.0625ZM6.9375 36.125V21.1415C8.81716 22.6149 11.4828 24.6824 15.5457 27.8134C17.3387 29.2024 20.4786 32.2686 24 32.2499C27.5041 32.2686 30.6043 29.2469 32.4536 27.8141C36.5164 24.6832 39.1828 22.6151 41.0625 21.1416V36.125H6.9375Z" fill="currentColor"/></svg>
+            Forward booking emails
+          </span>
+          <span class="badge badge-outline border-primary/30 text-primary/80 gap-1.5 py-3 px-3">
+            <svg class="h-3.5 w-3.5" viewBox="0 0 48 48" fill="none"><path d="M30.5714 16.7143C30.5714 14.8214 29.9018 13.2054 28.5625 11.8661C27.2232 10.5268 25.6071 9.85714 23.7143 9.85714C21.8214 9.85714 20.2054 10.5268 18.8661 11.8661C17.5268 13.2054 16.8571 14.8214 16.8571 16.7143C16.8571 18.6071 17.5268 20.2232 18.8661 21.5625C20.2054 22.9018 21.8214 23.5714 23.7143 23.5714C25.6071 23.5714 27.2232 22.9018 28.5625 21.5625C29.9018 20.2232 30.5714 18.6071 30.5714 16.7143ZM37.4286 16.7143C37.4286 18.6607 37.1339 20.2589 36.5446 21.5089L26.7946 42.2411C26.5089 42.8304 26.0848 43.2946 25.5223 43.6339C24.9598 43.9732 24.3571 44.1429 23.7143 44.1429C23.0714 44.1429 22.4688 43.9732 21.9063 43.6339C21.3438 43.2946 20.9286 42.8304 20.6607 42.2411L10.8839 21.5089C10.2946 20.2589 10 18.6607 10 16.7143C10 12.9286 11.3393 9.69643 14.0179 7.01786C16.6964 4.33929 19.9286 3 23.7143 3C27.5 3 30.7321 4.33929 33.4107 7.01786C36.0893 9.69643 37.4286 12.9286 37.4286 16.7143Z" fill="currentColor"/></svg>
+            Pin places on a map
+          </span>
+          <span class="badge badge-outline border-primary/30 text-primary/80 gap-1.5 py-3 px-3">
+            <svg class="h-3.5 w-3.5" viewBox="0 0 48 48" fill="none"><path d="M38.6 13.6C39.26 13.6 39.8 14.14 39.8 14.8V17.2H8.6V14.8C8.6 14.14 9.14 13.6 9.8 13.6H38.6ZM39.8 22V34C39.8 34.66 39.26 35.2 38.6 35.2H9.8C9.14 35.2 8.6 34.66 8.6 34V22H39.8ZM9.8 10C7.1525 10 5 12.1525 5 14.8V34C5 36.6475 7.1525 38.8 9.8 38.8H38.6C41.2475 38.8 43.4 36.6475 43.4 34V14.8C43.4 12.1525 41.2475 10 38.6 10H9.8ZM11 31C11 31.9975 11.8025 32.8 12.8 32.8H16.4C17.3975 32.8 18.2 31.9975 18.2 31C18.2 30.0025 17.3975 29.2 16.4 29.2H12.8C11.8025 29.2 11 30.0025 11 31ZM21.8 31C21.8 31.9975 22.6025 32.8 23.6 32.8H28.4C29.3975 32.8 30.2 31.9975 30.2 31C30.2 30.0025 29.3975 29.2 28.4 29.2H23.6C22.6025 29.2 21.8 30.0025 21.8 31Z" fill="currentColor"/></svg>
+            Track all expenses
+          </span>
+        </div>
+
+        <!-- CTAs -->
+        <div class="flex flex-wrap gap-3">
+          <a href="#interest" class="btn btn-primary btn-lg shadow-lg shadow-primary/20">
+            Get early access
+            <svg class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+          <a href="https://github.com/GeertClaes/daplanstan" target="_blank" rel="noopener"
+             class="btn btn-outline btn-lg border-base-content/20 hover:border-primary hover:text-primary">
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            View on GitHub
+          </a>
+        </div>
+      </div>
+
+      <!-- Right: phone mockup — Trip timeline -->
+      <div class="flex justify-center">
+        <div class="w-72 phone-frame">
+          <img data-screen="Itinerary.webp" src="screenshots-webp/stan/Itinerary.webp" alt="DaPlanStan itinerary view" class="w-full block" />
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="gradient-sep max-w-6xl mx-auto"></div>
+
+
+  <!-- ══════════════════════════════════════
+       SECTION 2 — HOW IT WORKS
+  ════════════════════════════════════════ -->
+  <section id="how-it-works" class="py-24 px-6">
+    <div class="max-w-4xl mx-auto">
+
+      <p class="section-label text-center mb-3">How it works</p>
+      <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-center mb-16">
+        From inbox to itinerary in three steps
+      </h2>
+
+      <p class="text-center text-base-content/40 text-sm mb-12 -mt-10">
+        No bookings yet? <span class="text-primary/70">Ask ChatGPT or Claude for ideas and import them straight to your itinerary</span> — see the AI import feature below.
+      </p>
+
+      <div class="grid md:grid-cols-3 gap-8">
+
+        <div class="flex flex-col items-center text-center gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-black text-xl">1</div>
+          <h3 class="font-bold text-lg">Forward your booking email</h3>
+          <p class="text-base-content/60 text-sm leading-relaxed">Each trip gets a unique inbound address. Forward confirmation emails from Booking.com, airlines, tour operators — anything.</p>
+        </div>
+
+        <div class="flex flex-col items-center text-center gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-black text-xl">2</div>
+          <h3 class="font-bold text-lg">AI extracts the details</h3>
+          <p class="text-base-content/60 text-sm leading-relaxed">Claude Haiku reads the email and pulls out dates, addresses, amounts, and confirmation numbers. You review — nothing is saved silently.</p>
+        </div>
+
+        <div class="flex flex-col items-center text-center gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-black text-xl">3</div>
+          <h3 class="font-bold text-lg">Your itinerary updates</h3>
+          <p class="text-base-content/60 text-sm leading-relaxed">Confirm and the booking appears in your timeline, on your map, and in expenses — synced for everyone on the trip instantly.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="gradient-sep max-w-6xl mx-auto"></div>
+
+
+  <!-- ══════════════════════════════════════
+       SECTION 3 — FEATURE SCREENSHOTS
+  ════════════════════════════════════════ -->
+  <section id="features" class="py-24 px-6">
+    <div class="max-w-6xl mx-auto">
+
+      <p class="section-label text-center mb-3">Features</p>
+      <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-center mb-4">
+        Built for families and friends who travel together
+      </h2>
+      <p class="text-center text-base-content/50 mb-16 max-w-xl mx-auto">
+        No subscription per person. No per-seat pricing. Just the tools your whole group needs — and nothing you don't.
+      </p>
+
+      <!-- Feature 1: Trip items — confirmed, idea, new -->
+      <div class="grid md:grid-cols-2 gap-12 items-center mb-24">
+        <div>
+          <h3 class="text-2xl font-bold mb-4">Every stop on the itinerary — confirmed, ideas, and drafts</h3>
+          <p class="text-base-content/60 leading-relaxed mb-4">
+            Tap any item to see full details: address, dates, confirmation number, notes. Items flow from idea to booked as your trip takes shape. Add anything — accommodation, restaurant, activity, or just a thought.
+          </p>
+          <ul class="space-y-2 text-sm text-base-content/60">
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Confirmed bookings show full details and map pin</li>
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Ideas and shortlisted spots kept separate from bookings</li>
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Add items manually or import from email or AI</li>
+          </ul>
+        </div>
+        <!-- Trip items carousel -->
+        <div data-carousel-group class="flex flex-col items-center gap-4">
+          <div class="w-72 phone-frame">
+            <img data-screen="TripItem-Confirmed.webp" src="screenshots-webp/stan/TripItem-Confirmed.webp" alt="Trip item" class="w-full block" />
+          </div>
+          <div data-carousel class="flex gap-2">
+            <button data-screen="TripItem-Confirmed.webp" class="carousel-btn text-xs px-3 py-1.5 rounded-full border font-semibold transition-all bg-primary/10 border-primary text-primary">Confirmed</button>
+            <button data-screen="TripItem-Idea.webp"      class="carousel-btn text-xs px-3 py-1.5 rounded-full border font-semibold transition-all bg-base-200 border-base-content/15 text-base-content/40">Idea</button>
+            <button data-screen="TripItem-New.webp"       class="carousel-btn text-xs px-3 py-1.5 rounded-full border font-semibold transition-all bg-base-200 border-base-content/15 text-base-content/40">New item</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 2: Expenses -->
+      <div class="grid md:grid-cols-2 gap-12 items-center mb-24">
+        <!-- Expenses carousel -->
+        <div data-carousel-group class="order-2 md:order-1 flex flex-col items-center gap-4">
+          <div class="w-72 phone-frame">
+            <img data-screen="Expenses.webp" src="screenshots-webp/stan/Expenses.webp" alt="Expenses" class="w-full block" />
+          </div>
+          <div data-carousel class="flex gap-2">
+            <button data-screen="Expenses.webp"       class="carousel-btn text-xs px-3 py-1.5 rounded-full border font-semibold transition-all bg-primary/10 border-primary text-primary">Overview</button>
+            <button data-screen="ExpenseDetail.webp"  class="carousel-btn text-xs px-3 py-1.5 rounded-full border font-semibold transition-all bg-base-200 border-base-content/15 text-base-content/40">Detail</button>
+          </div>
+        </div>
+        <div class="order-1 md:order-2">
+          <h3 class="text-2xl font-bold mb-4">Expense tracking — built in, not bolted on</h3>
+          <p class="text-base-content/60 leading-relaxed mb-4">
+            Every booking email automatically creates an expense entry. Add manual costs on the go — meals, taxis, entry tickets. Multi-currency support with a per-trip budget overview for the whole group.
+          </p>
+          <ul class="space-y-2 text-sm text-base-content/60">
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Expenses linked automatically from parsed emails</li>
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Works with any currency</li>
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Shared view for your whole travel group</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Feature 3: Trip overview tab -->
+      <div class="grid md:grid-cols-2 gap-12 items-center mb-24">
+        <div>
+          <h3 class="text-2xl font-bold mb-4">Trip overview — your group's home base</h3>
+          <p class="text-base-content/60 leading-relaxed mb-4">
+            The Trip tab brings together the full picture: your trip details, cover photo, travel companions, and quick access to all your bookings. Everyone on the trip sees the same view in real time.
+          </p>
+          <ul class="space-y-2 text-sm text-base-content/60">
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Invite companions by email or shareable link</li>
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Auto-fetch cover photo from Pexels</li>
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Live updates for everyone via Turbo Streams</li>
+          </ul>
+        </div>
+        <div class="flex justify-center">
+          <div class="w-72 phone-frame">
+            <img data-screen="Trip.webp" src="screenshots-webp/stan/Trip.webp" alt="DaPlanStan trip overview" class="w-full block" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 4: Email inbox review -->
+      <div class="grid md:grid-cols-2 gap-12 items-center mb-24">
+        <div class="order-2 md:order-1 flex justify-center">
+          <div class="w-72 phone-frame">
+            <img data-screen="Inbox.webp" src="screenshots-webp/stan/Inbox.webp" alt="DaPlanStan inbox" class="w-full block" />
+          </div>
+        </div>
+        <div class="order-1 md:order-2">
+          <span class="badge badge-sm bg-primary/10 text-primary border-primary/20 mb-4">The killer feature</span>
+          <h3 class="text-2xl font-bold mb-4">Inbox review — AI parses, you decide</h3>
+          <p class="text-base-content/60 leading-relaxed mb-4">
+            Forward a Booking.com confirmation or a flight receipt. Claude Haiku reads it, extracts every detail, and presents it for your review. One tap to confirm. Nothing enters your itinerary without your say-so.
+          </p>
+          <ul class="space-y-2 text-sm text-base-content/60">
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Dates, times, addresses, confirmation numbers</li>
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Amounts and currencies auto-detected</li>
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Works with any email source</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Feature 5: AI idea import -->
+      <div class="grid md:grid-cols-2 gap-12 items-center mb-24">
+        <div>
+          <span class="badge badge-sm bg-accent/10 text-accent border-accent/20 mb-4">Before you've booked anything</span>
+          <h3 class="text-2xl font-bold mb-4">AI trip ideas — brainstorm first, plan together</h3>
+          <p class="text-base-content/60 leading-relaxed mb-4">
+            Not sure where to eat or what to do? Ask ChatGPT, Claude, or any AI for suggestions. DaPlanStan gives you the exact prompt to copy — paste the result back and your ideas import instantly as draft items on the itinerary.
+          </p>
+          <ul class="space-y-2 text-sm text-base-content/60 mb-6">
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Works with ChatGPT, Claude, Gemini — any AI</li>
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Imports as ideas, separate from confirmed bookings</li>
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> The app gives you the exact prompt to copy</li>
+          </ul>
+          <div class="space-y-3">
+            <div class="bg-base-300 rounded-2xl p-4 border border-base-content/10">
+              <p class="text-xs text-base-content/40 font-semibold uppercase tracking-widest mb-2">1 — Copy this prompt into any AI</p>
+              <p class="text-sm text-primary/80 font-mono leading-relaxed">"Return ONLY a JSON array of things to do in Rome for a family of 4. Use this format exactly: [{&quot;kind&quot;: &quot;eat|do|stay|shop&quot;, &quot;name&quot;: &quot;...&quot;, &quot;address&quot;: &quot;...&quot;, &quot;notes&quot;: &quot;...&quot;}]"</p>
+            </div>
+            <div class="bg-base-300 rounded-2xl p-4 border border-base-content/10">
+              <p class="text-xs text-base-content/40 font-semibold uppercase tracking-widest mb-2">2 — AI returns JSON like this</p>
+              <pre class="text-xs text-success/80 font-mono leading-relaxed overflow-x-auto">[
+  { "kind": "eat", "name": "Tonnarello",
+    "address": "Via della Paglia 1, Rome",
+    "notes": "Classic cacio e pepe, book ahead" },
+  { "kind": "do", "name": "Borghese Gallery",
+    "address": "Piazzale Scipione Borghese 5",
+    "notes": "Timed entry, kids love the sculptures" }
+]</pre>
+            </div>
+            <div class="bg-base-300 rounded-2xl p-4 border border-base-content/10">
+              <p class="text-xs text-base-content/40 font-semibold uppercase tracking-widest mb-2">3 — Paste or upload into DaPlanStan</p>
+              <p class="text-sm text-base-content/60">All items appear as ideas on your itinerary. Review, keep the ones you like, delete the rest.</p>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-center">
+          <div class="w-72 phone-frame">
+            <img data-screen="ImportAI.webp" src="screenshots-webp/stan/ImportAI.webp" alt="DaPlanStan AI import" class="w-full block" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop mockup -->
+      <div class="mb-8">
+        <div class="text-center mb-8">
+          <h3 class="text-2xl font-bold mb-3">Also great on desktop &amp; tablet</h3>
+          <p class="text-base-content/60 max-w-xl mx-auto">
+            Map and itinerary side by side. Pin a shortlisted restaurant and see it appear on the map instantly.
+          </p>
+        </div>
+        <div class="rounded-3xl overflow-hidden border border-base-content/10" style="box-shadow: 0 24px 60px rgba(0,0,0,0.4);">
+          <img data-screen="Desktop.webp" src="screenshots-webp/stan/Desktop.webp" alt="DaPlanStan desktop view" class="w-full block" loading="lazy" />
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="gradient-sep max-w-6xl mx-auto"></div>
+
+
+  <!-- ══════════════════════════════════════
+       SECTION 4 — BUILT WITH RAILS
+  ════════════════════════════════════════ -->
+  <section class="py-24 px-6 bg-base-200/50">
+    <div class="max-w-4xl mx-auto text-center">
+
+      <p class="section-label mb-3">The stack</p>
+      <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-6">
+        Proudly built on <span class="text-primary">Ruby on Rails 8</span>
+      </h2>
+      <p class="text-base-content/60 text-lg leading-relaxed mb-12 max-w-2xl mx-auto">
+        No microservices. No separate frontend. No Docker Compose maze. Rails 8 full-stack — server-rendered with Hotwire for reactive UI, Solid Queue for background jobs, SQLite as the database. One server, one process, runs quietly on a $6/mo VPS.
+      </p>
+
+      <!-- Stack badges -->
+      <div class="flex flex-wrap justify-center gap-3 mb-12">
+        <a href="https://rubyonrails.org" target="_blank" rel="noopener" class="badge badge-lg bg-base-300 border-base-content/10 text-base-content/80 font-semibold py-4 px-4 hover:border-primary/40 hover:text-primary transition-colors">Ruby on Rails 8.1</a>
+        <a href="https://sqlite.org" target="_blank" rel="noopener" class="badge badge-lg bg-base-300 border-base-content/10 text-base-content/80 font-semibold py-4 px-4 hover:border-primary/40 hover:text-primary transition-colors">SQLite</a>
+        <a href="https://hotwired.dev" target="_blank" rel="noopener" class="badge badge-lg bg-base-300 border-base-content/10 text-base-content/80 font-semibold py-4 px-4 hover:border-primary/40 hover:text-primary transition-colors">Hotwire (Turbo + Stimulus)</a>
+        <a href="https://daisyui.com" target="_blank" rel="noopener" class="badge badge-lg bg-base-300 border-base-content/10 text-base-content/80 font-semibold py-4 px-4 hover:border-primary/40 hover:text-primary transition-colors">TailwindCSS v4 + DaisyUI v5</a>
+        <a href="https://github.com/rails/solid_queue" target="_blank" rel="noopener" class="badge badge-lg bg-base-300 border-base-content/10 text-base-content/80 font-semibold py-4 px-4 hover:border-primary/40 hover:text-primary transition-colors">Solid Queue</a>
+        <a href="https://guides.rubyonrails.org/action_mailbox_basics.html" target="_blank" rel="noopener" class="badge badge-lg bg-base-300 border-base-content/10 text-base-content/80 font-semibold py-4 px-4 hover:border-primary/40 hover:text-primary transition-colors">ActionMailbox</a>
+        <a href="https://www.anthropic.com" target="_blank" rel="noopener" class="badge badge-lg bg-base-300 border-base-content/10 text-base-content/80 font-semibold py-4 px-4 hover:border-primary/40 hover:text-primary transition-colors">Anthropic Claude Haiku</a>
+        <a href="https://leafletjs.com" target="_blank" rel="noopener" class="badge badge-lg bg-base-300 border-base-content/10 text-base-content/80 font-semibold py-4 px-4 hover:border-primary/40 hover:text-primary transition-colors">Leaflet.js + OpenStreetMap</a>
+        <a href="https://postmarkapp.com" target="_blank" rel="noopener" class="badge badge-lg bg-base-300 border-base-content/10 text-base-content/80 font-semibold py-4 px-4 hover:border-primary/40 hover:text-primary transition-colors">Postmark</a>
+        <a href="https://www.pexels.com" target="_blank" rel="noopener" class="badge badge-lg bg-base-300 border-base-content/10 text-base-content/80 font-semibold py-4 px-4 hover:border-primary/40 hover:text-primary transition-colors">Pexels</a>
+        <a href="https://www.cloudflare.com" target="_blank" rel="noopener" class="badge badge-lg bg-base-300 border-base-content/10 text-base-content/80 font-semibold py-4 px-4 hover:border-primary/40 hover:text-primary transition-colors">Cloudflare</a>
+        <a href="https://omarchy.org" target="_blank" rel="noopener" class="badge badge-lg bg-base-300 border-primary/20 text-primary/80 font-semibold py-4 px-4 hover:border-primary/60 hover:text-primary transition-colors">Omarchy ✦</a>
+      </div>
+
+      <!-- Self-host quickstart -->
+      <div class="text-left bg-base-300 rounded-3xl p-6 border border-base-content/10 max-w-2xl mx-auto">
+        <p class="section-label mb-4">Self-host in minutes</p>
+        <pre class="text-sm text-primary leading-relaxed overflow-x-auto"><code>git clone https://github.com/GeertClaes/daplanstan.git
+cd daplanstan
+bundle install
+
+# Download DaisyUI plugin
+mkdir -p app/assets/tailwind/plugins
+curl -sL -o app/assets/tailwind/plugins/daisyui.js \
+  https://cdn.jsdelivr.net/npm/daisyui@5/+esm
+
+cp .env.example .env   # fill in your API keys
+rails db:encryption:init
+rails db:create db:migrate db:seed
+bin/dev</code></pre>
+        <a href="https://github.com/GeertClaes/daplanstan/blob/main/docs/SETUP.md"
+           class="btn btn-sm btn-outline border-primary/30 text-primary mt-4">
+          Full setup guide →
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="gradient-sep max-w-6xl mx-auto"></div>
+
+
+  <!-- ══════════════════════════════════════
+       SECTION 4b — THEMES
+  ════════════════════════════════════════ -->
+  <section class="py-24 px-6">
+    <div class="max-w-4xl mx-auto text-center">
+
+      <p class="section-label mb-3">Themes</p>
+      <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">
+        20+ themes included
+      </h2>
+      <p class="text-base-content/60 text-lg leading-relaxed mb-12 max-w-xl mx-auto">
+        Pick the look you love — or let your travel companions pick theirs. Every theme ships with the app, no config needed. The 5 below are just examples.
+      </p>
+
+      <!-- Theme swatches -->
+      <div id="theme-switcher" class="flex flex-wrap justify-center gap-3 mb-10">
+        <!-- theme buttons injected by JS -->
+      </div>
+
+
+
+    </div>
+  </section>
+
+  <div class="gradient-sep max-w-6xl mx-auto"></div>
+
+
+  <!-- ══════════════════════════════════════
+       SECTION 5 — OPEN SOURCE + LICENSE
+  ════════════════════════════════════════ -->
+  <section id="open-source" class="py-24 px-6">
+    <div class="max-w-4xl mx-auto">
+
+      <div class="grid md:grid-cols-2 gap-12 items-start">
+
+        <!-- Left: open source ethos -->
+        <div>
+          <p class="section-label mb-3">Open source</p>
+          <h2 class="text-3xl font-extrabold tracking-tight mb-6">
+            Fully open. Fully forkable.<br />No hidden features.
+          </h2>
+          <p class="text-base-content/60 leading-relaxed mb-6">
+            Every line of DaPlanStan is on GitHub. Self-hosters get the full feature set — email parsing, maps, expenses, themes, everything. Bring your own API keys and run it forever for free.
+          </p>
+          <p class="text-base-content/60 leading-relaxed mb-8">
+            We believe open source travel tools shouldn't be crippled. If you can run a Rails app, you get the whole thing.
+          </p>
+          <a href="https://github.com/GeertClaes/daplanstan" target="_blank" rel="noopener"
+             class="btn btn-outline border-primary/30 text-primary hover:bg-primary hover:text-primary-content">
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            Browse the source
+          </a>
+        </div>
+
+        <!-- Right: license card -->
+        <div class="rounded-3xl bg-secondary/5 border-2 border-secondary/30 p-8">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-12 h-12 rounded-2xl bg-secondary/15 border border-secondary/30 flex items-center justify-center">
+              <svg class="h-6 w-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            </div>
+            <div>
+              <p class="text-xl font-extrabold text-secondary">O'Saasy License</p>
+              <p class="text-xs text-base-content/50">Open source · anti-SaaS clause · <a href="https://osassy.dev" target="_blank" rel="noopener" class="underline hover:text-secondary transition-colors">osassy.dev</a></p>
+            </div>
+          </div>
+
+          <p class="text-base-content/50 text-xs mb-6">Proudly open source, inspired by 37signals' Fizzy license.</p>
+
+          <p class="text-base-content/70 text-sm leading-relaxed mb-6">
+            DaPlanStan is free to use, self-host, fork, and modify. The one restriction: you may not offer it as a <strong class="text-base-content">commercial hosted SaaS product</strong> that competes with daplanstan.com.
+          </p>
+
+          <div class="space-y-3 mb-6">
+            <div class="flex items-center gap-3 text-sm">
+              <span class="text-success text-lg">✓</span>
+              <span class="text-base-content/70">Self-host for personal or team use — free forever</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm">
+              <span class="text-success text-lg">✓</span>
+              <span class="text-base-content/70">Fork and modify for your own needs</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm">
+              <span class="text-success text-lg">✓</span>
+              <span class="text-base-content/70">Contribute back — PRs welcome</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm">
+              <span class="text-error text-lg">✗</span>
+              <span class="text-base-content/70">Sell it as a hosted SaaS competing with this project</span>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <a href="https://github.com/GeertClaes/daplanstan/blob/main/LICENSE.md"
+               class="btn btn-sm bg-secondary/15 text-secondary hover:bg-secondary hover:text-secondary-content border-secondary/30 w-full">
+              Read the O'Saasy License →
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="gradient-sep max-w-6xl mx-auto"></div>
+
+
+  <!-- ══════════════════════════════════════
+       SECTION 6 — PRICING
+  ════════════════════════════════════════ -->
+  <section id="pricing" class="py-24 px-6 bg-base-200/50">
+    <div class="max-w-3xl mx-auto text-center">
+
+      <p class="section-label mb-3">Pricing</p>
+      <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-6">
+        One price. Every trip.<br />Every travel companion.
+      </h2>
+      <p class="text-base-content/60 text-lg leading-relaxed mb-12 max-w-xl mx-auto">
+        No per-person maths. No bill shock when you add your partner. One account covers your whole group, unlimited trips, forever.
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-6 text-left">
+
+        <!-- Self-hosted -->
+        <div class="rounded-3xl bg-base-200 border border-base-content/10 p-8">
+          <p class="text-sm font-bold text-base-content/40 uppercase tracking-widest mb-4">Self-hosted</p>
+          <p class="text-5xl font-black text-base-content mb-2">Free</p>
+          <p class="text-base-content/50 text-sm mb-8">forever, bring your own API keys</p>
+          <ul class="space-y-3 text-sm text-base-content/70 mb-8">
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Full feature set — nothing removed</li>
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Your own Anthropic + Pexels keys</li>
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Your server, your data</li>
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Runs on a $6/mo VPS</li>
+          </ul>
+          <a href="https://github.com/GeertClaes/daplanstan/blob/main/docs/SETUP.md"
+             class="btn btn-outline border-base-content/20 hover:border-primary hover:text-primary w-full">
+            Setup guide →
+          </a>
+        </div>
+
+        <!-- Hosted -->
+        <div class="rounded-3xl bg-primary/5 border border-primary/30 p-8 relative overflow-hidden">
+          <span class="badge badge-sm bg-primary text-primary-content border-0 absolute top-6 right-6 font-bold">Early bird</span>
+          <p class="text-sm font-bold text-primary/60 uppercase tracking-widest mb-4">Hosted by us</p>
+          <div class="flex items-end gap-2 mb-2">
+            <p class="text-5xl font-black text-base-content">$50</p>
+            <p class="text-base-content/50 text-sm pb-2">/ year</p>
+          </div>
+          <p class="text-base-content/50 text-sm mb-8">one account · unlimited trips · unlimited travel companions</p>
+          <ul class="space-y-3 text-sm text-base-content/70 mb-8">
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> All features — we handle the APIs</li>
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Unlimited trips &amp; travel companions</li>
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> No per-person pricing — ever</li>
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Email support</li>
+          </ul>
+          <a href="#interest" class="btn btn-primary w-full shadow-lg shadow-primary/20">
+            Register interest →
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="gradient-sep max-w-6xl mx-auto"></div>
+
+
+  <!-- ══════════════════════════════════════
+       SECTION 7 — INTEREST / TALLY FORM
+  ════════════════════════════════════════ -->
+  <section id="interest" class="py-24 px-6">
+    <div class="max-w-2xl mx-auto text-center">
+
+      <p class="section-label mb-3">Early access</p>
+      <h2 class="text-3xl font-extrabold tracking-tight mb-4">
+        Tell us how you'd use it
+      </h2>
+      <p class="text-base-content/60 mb-12">
+        We're gauging demand before launch. Takes 30 seconds — helps us understand what matters most.
+      </p>
+
+      <div class="rounded-3xl overflow-hidden">
+        <iframe data-tally-src="https://tally.so/embed/zxrL01?alignLeft=1&hideTitle=1&dynamicHeight=1" loading="lazy" width="100%" height="534" frameborder="0" marginheight="0" marginwidth="0" title="Join the waitlist"></iframe>
+      </div>
+      <script>var d=document,w="https://tally.so/widgets/embed.js",v=function(){"undefined"!=typeof Tally?Tally.loadEmbeds():d.querySelectorAll("iframe[data-tally-src]:not([src])").forEach((function(e){e.src=e.dataset.tallySrc}))};if("undefined"!=typeof Tally)v();else if(d.querySelector('script[src="'+w+'"]')==null){var s=d.createElement("script");s.src=w,s.onload=v,s.onerror=v,d.body.appendChild(s);}</script>
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       FOOTER
+  ════════════════════════════════════════ -->
+  <footer class="border-t border-base-content/10 py-12 px-6">
+    <div class="max-w-6xl mx-auto">
+
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+
+        <!-- Logo + tagline -->
+        <div class="flex items-center gap-3">
+          <svg class="h-7 w-7 shrink-0" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="DaPlanStan">
+            <path d="M466.763 970.011H164.515C147.171 970.011 130.789 961.681 120.832 947.585C110.875 933.489 108.305 915.389 113.926 899.05L209.483 625.781C210.928 621.616 213.016 617.932 215.265 614.248C248.348 640.197 456.645 810.15 466.763 970.011Z" fill="var(--color-primary)"/>
+            <path d="M693.716 806.872L464.715 851.934C450.792 823.909 433.509 796.681 414.626 771.204L570.814 710.855L693.716 806.872Z" fill="var(--color-primary)"/>
+            <path d="M782.655 593.401L567.971 677.119C584.596 657.072 608.734 626.599 633.031 589.712H763.313C770.027 589.712 776.581 590.995 782.655 593.401Z" fill="var(--color-primary)"/>
+            <path d="M726.739 833.532L888.466 960.422C879.65 966.335 869.392 970.01 858.493 970.01H497.694C496.091 940.765 488.718 911.36 477.498 882.754L726.739 833.532Z" fill="var(--color-primary)"/>
+            <path d="M909.565 934.741L606.308 696.711L810.938 617.314C812.382 619.876 813.664 622.597 814.627 625.478L910.046 898.564C914.216 910.41 913.895 923.216 909.565 934.741Z" fill="var(--color-primary)"/>
+            <path d="M486.698 708.838L394.65 744.592C335.797 671.481 268.926 615.044 241.344 593.239C247.277 590.995 253.692 589.712 260.266 589.712H390.962C430.09 648.714 468.577 691.843 477.076 701.142C479.962 704.188 483.33 706.593 486.698 708.838Z" fill="var(--color-primary)"/>
+            <path d="M512.767 677.119C518.11 677.119 523.263 674.823 526.889 670.996C535.095 662.004 728.985 447.905 728.985 269.968C728.985 150.387 632.04 53 512.767 53C393.494 53 296.549 150.387 296.549 269.968C296.549 447.905 490.439 662.004 498.645 670.996C502.271 674.823 507.424 677.119 512.767 677.119Z" fill="var(--color-secondary)"/>
+            <path d="M512.766 414.897C592.376 414.897 656.912 350.361 656.912 270.751C656.912 191.142 592.376 126.606 512.766 126.606C433.157 126.606 368.621 191.142 368.621 270.751C368.621 350.361 433.157 414.897 512.766 414.897Z" fill="white"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M441.624 230.259C438.817 230.259 435.971 231.634 434.279 234.613L409.288 278.678C405.512 285.954 416.116 292.115 421.292 284.057L438.084 260.34L433.427 289.033L426.877 349.312C427.265 357.034 442.091 356.995 442.985 349.312L452.27 309.973C452.429 308.732 453.27 307.674 454.57 307.674C455.858 307.674 456.71 308.732 456.855 309.973L461.498 349.312C462.408 356.995 477.217 357.034 477.611 349.312L475.701 293.69L480.344 246.051H488.355L492.506 254.018V289.03L485.956 349.309C486.344 357.031 501.153 356.992 502.064 349.309L511.35 305.333C511.494 304.075 512.349 303.031 513.635 303.031C514.937 303.031 515.778 304.075 515.923 305.333L525.22 349.309C526.119 356.992 540.928 357.031 541.333 349.309L534.763 289.036V254.02L538.929 246.054H546.537L551.18 293.692L549.269 349.314C549.661 357.037 564.472 356.998 565.383 349.314L570.026 309.976C570.17 308.734 571.023 307.676 572.325 307.676C573.614 307.676 574.449 308.734 574.594 309.976L583.893 349.314C584.804 356.998 599.599 357.037 600.007 349.314L593.437 289.036L588.794 260.343L605.586 284.06C610.764 292.115 621.366 285.956 617.593 278.681L592.601 234.616C590.91 231.637 588.045 230.262 585.237 230.262H581.769C577.704 232.72 572.817 234.138 567.666 234.138C562.52 234.138 557.628 232.72 553.568 230.262H527.735C523.67 232.72 518.797 234.138 513.632 234.138C508.487 234.138 503.611 232.72 499.548 230.262H473.299C469.248 232.72 464.347 234.138 459.196 234.138C454.05 234.138 449.174 232.72 445.112 230.262H441.624V230.259Z" fill="var(--color-secondary-content)"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M459.212 187.945C470.161 187.945 478.983 195.479 478.983 204.837V211.748C478.983 221.109 470.161 228.642 459.212 228.642C448.25 228.642 439.428 221.109 439.428 211.748V204.837C439.425 195.482 448.25 187.945 459.212 187.945Z" fill="var(--color-secondary-content)"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M567.666 187.945C556.717 187.945 547.896 195.479 547.896 204.837V211.748C547.896 221.109 556.717 228.642 567.666 228.642C578.629 228.642 587.451 221.109 587.451 211.748V204.837C587.451 195.482 578.629 187.945 567.666 187.945Z" fill="var(--color-secondary-content)"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M513.634 187.945C524.597 187.945 533.419 195.479 533.419 204.837V211.748C533.419 221.109 524.597 228.642 513.634 228.642C502.685 228.642 493.866 221.109 493.866 211.748V204.837C493.869 195.482 502.688 187.945 513.634 187.945Z" fill="var(--color-secondary-content)"/>
+          </svg>
+          <div>
+            <span class="font-extrabold text-sm">
+              <span class="text-primary">DaPlan</span><span class="text-secondary">Stan</span>
+            </span>
+            <p class="text-xs text-base-content/40">Trip planning for people who actually travel.</p>
+          </div>
+        </div>
+
+        <!-- Links -->
+        <nav class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-base-content/50">
+          <a href="https://github.com/GeertClaes/daplanstan" target="_blank" rel="noopener" class="hover:text-primary transition-colors">GitHub</a>
+          <a href="https://github.com/GeertClaes/daplanstan/blob/main/docs/SETUP.md" class="hover:text-primary transition-colors">Setup guide</a>
+          <a href="https://osassy.dev" target="_blank" rel="noopener" class="hover:text-primary transition-colors">License (O'Saasy)</a>
+          <a href="https://github.com/GeertClaes/daplanstan/issues" target="_blank" rel="noopener" class="hover:text-primary transition-colors">Issues</a>
+        </nav>
+
+        <!-- Built with -->
+        <p class="text-xs text-base-content/30">
+          Built with Ruby on Rails 8 · &copy; 2026 Geert Claes
+        </p>
+
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ── Screenshot carousels ─────────────────────────────────
+    document.querySelectorAll("[data-carousel]").forEach(carousel => {
+      const img = carousel.closest("[data-carousel-group]").querySelector("img[data-screen]")
+      const btns = carousel.querySelectorAll(".carousel-btn")
+      btns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const screen = btn.dataset.screen
+          img.dataset.screen = screen
+          img.src = "screenshots-webp/" + document.documentElement.dataset.theme + "/" + screen
+          btns.forEach(b => {
+            const active = b === btn
+            b.classList.toggle("bg-primary/10",           active)
+            b.classList.toggle("border-primary",          active)
+            b.classList.toggle("text-primary",            active)
+            b.classList.toggle("bg-base-200",            !active)
+            b.classList.toggle("border-base-content/15", !active)
+            b.classList.toggle("text-base-content/40",   !active)
+          })
+        })
+      })
+    })
+
+    // ── Lightbox ─────────────────────────────────────────────
+    ;(function() {
+      const screens = [
+        { file: "Itinerary.webp",          label: "Itinerary" },
+        { file: "TripItem-Confirmed.webp", label: "Confirmed booking" },
+        { file: "TripItem-Idea.webp",      label: "Idea" },
+        { file: "TripItem-New.webp",       label: "New item" },
+        { file: "Expenses.webp",           label: "Expenses" },
+        { file: "ExpenseDetail.webp",      label: "Expense detail" },
+        { file: "Trip.webp",               label: "Trip overview" },
+        { file: "Inbox.webp",              label: "Inbox" },
+        { file: "ImportAI.webp",           label: "AI import" },
+        { file: "Desktop.webp",            label: "Desktop" },
+      ]
+      let current = 0
+
+      const lb = document.createElement("div")
+      lb.id = "lightbox"
+      lb.style.cssText = "display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.93);backdrop-filter:blur(10px);align-items:center;justify-content:center"
+      lb.innerHTML =
+        '<button id="lb-prev" style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:3rem;line-height:1;color:rgba(255,255,255,0.4);background:none;border:none;cursor:pointer;padding:0.75rem;user-select:none">&#8249;</button>' +
+        '<button id="lb-next" style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:3rem;line-height:1;color:rgba(255,255,255,0.4);background:none;border:none;cursor:pointer;padding:0.75rem;user-select:none">&#8250;</button>' +
+        '<button id="lb-close" style="position:absolute;top:1rem;right:1rem;font-size:1.5rem;line-height:1;color:rgba(255,255,255,0.4);background:none;border:none;cursor:pointer;padding:0.5rem">&#x2715;</button>' +
+        '<img id="lb-img" style="max-height:88vh;max-width:88vw;object-fit:contain;border-radius:1.25rem;box-shadow:0 32px 80px rgba(0,0,0,0.7)" />' +
+        '<div style="position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap">' +
+          '<p id="lb-label" style="color:rgba(255,255,255,0.65);font-size:0.875rem;font-weight:600;margin-bottom:0.2rem"></p>' +
+          '<p id="lb-counter" style="color:rgba(255,255,255,0.28);font-size:0.75rem"></p>' +
+        '</div>'
+      document.body.appendChild(lb)
+
+      const lbImg     = document.getElementById("lb-img")
+      const lbLabel   = document.getElementById("lb-label")
+      const lbCounter = document.getElementById("lb-counter")
+
+      function show(index) {
+        current = ((index % screens.length) + screens.length) % screens.length
+        const theme = document.documentElement.dataset.theme || "stan"
+        lbImg.src = "screenshots-webp/" + theme + "/" + screens[current].file
+        lbLabel.textContent   = screens[current].label
+        lbCounter.textContent = (current + 1) + " / " + screens.length
+        lb.style.display = "flex"
+        document.body.style.overflow = "hidden"
+      }
+
+      function close() {
+        lb.style.display = "none"
+        document.body.style.overflow = ""
+      }
+
+      document.getElementById("lb-prev").addEventListener("click",  e => { e.stopPropagation(); show(current - 1) })
+      document.getElementById("lb-next").addEventListener("click",  e => { e.stopPropagation(); show(current + 1) })
+      document.getElementById("lb-close").addEventListener("click", close)
+      lb.addEventListener("click", e => { if (e.target === lb) close() })
+
+      document.addEventListener("keydown", e => {
+        if (lb.style.display === "none") return
+        if (e.key === "Escape")      close()
+        if (e.key === "ArrowLeft")   show(current - 1)
+        if (e.key === "ArrowRight")  show(current + 1)
+      })
+
+      // Touch swipe
+      let touchX = 0
+      lb.addEventListener("touchstart", e => { touchX = e.touches[0].clientX }, { passive: true })
+      lb.addEventListener("touchend",   e => {
+        const dx = touchX - e.changedTouches[0].clientX
+        if (Math.abs(dx) > 50) show(current + (dx > 0 ? 1 : -1))
+      })
+
+      // Open lightbox on any screenshot click
+      document.querySelectorAll("img[data-screen]").forEach(img => {
+        img.addEventListener("click", () => {
+          const idx = screens.findIndex(s => s.file === img.dataset.screen)
+          show(idx >= 0 ? idx : 0)
+        })
+      })
+    })()
+  </script>
+
+</body>
+</html>

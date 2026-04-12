@@ -1,0 +1,56 @@
+<% content_for :nav_right do %>
+  <%= link_to "/", class: "flex items-center gap-1.5 text-sm font-medium px-4 py-1.5 rounded-full
+                            transition-colors hover:bg-white/10",
+                   style: "color: rgba(255,255,255,0.5)" do %>
+    Back
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+    </svg>
+  <% end %>
+<% end %>
+
+<div class="max-w-2xl mx-auto px-6 pt-28 pb-20 text-base-content">
+
+  <h1 class="text-3xl font-bold mb-2">Privacy Policy</h1>
+  <p class="text-sm text-base-content/40 mb-10">Last updated: April 2026</p>
+
+  <div class="space-y-8 text-base-content/80 leading-relaxed">
+
+    <section>
+      <h2 class="text-lg font-semibold text-base-content mb-2">1. What we collect</h2>
+      <p>When you sign in with Google, we receive your name, email address, and profile photo from your Google account. We store these to identify you within the app. We do not collect any other personal information beyond what you explicitly provide (e.g. trip details, expenses, notes).</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-base-content mb-2">2. How we use your data</h2>
+      <p>Your data is used solely to provide the DaPlanStan trip planning service to you. We do not sell, share, or use your data for advertising or analytics purposes.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-base-content mb-2">3. Inbound emails</h2>
+      <p>If you forward booking confirmation emails to your trip's inbox address, the content of those emails (sender, subject, body, attachments) is stored and processed by our AI to extract travel data. Email content is not shared with third parties beyond the AI processing service (Anthropic).</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-base-content mb-2">4. Data storage</h2>
+      <p>DaPlanStan is self-hosted software. Data is stored on the server you or your host provider operates. You are in control of where your data lives.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-base-content mb-2">5. Cookies &amp; sessions</h2>
+      <p>We use a single session cookie to keep you signed in. No tracking or advertising cookies are used.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-base-content mb-2">6. Deleting your data</h2>
+      <p>You can delete your account and all associated data from Settings. If you need assistance, contact us at the address below.</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-base-content mb-2">7. Contact</h2>
+      <p>Questions about this policy? Email <a href="mailto:hey@daplanstan.com" class="text-primary hover:underline">hey@daplanstan.com</a>.</p>
+    </section>
+
+  </div>
+
+</div>

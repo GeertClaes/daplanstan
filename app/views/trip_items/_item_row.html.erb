@@ -1,0 +1,51 @@
+<%# Timeline row for a single trip item.
+    Locals: item (TripItem), trip (Trip)
+%>
+<% geocoded = item.latitude.present? && item.longitude.present? %>
+<% icon_class = item.confirmed? ? "text-primary" : "text-base-content/30" %>
+
+<div class="flex items-stretch rounded-xl transition-all duration-150 group hover:bg-base-200 border-b border-base-content/8 last:border-b-0"
+     <% if geocoded %>
+       data-timeline-target="item"
+       data-selected="false"
+       data-action="click->timeline#select"
+       data-lat="<%= item.latitude %>"
+       data-lng="<%= item.longitude %>"
+       data-item-id="<%= item.id %>"
+     <% end %>>
+
+  <%# Main content — tap to locate on map %>
+  <div class="flex gap-3 items-start px-3 py-3 flex-1 min-w-0 <%= geocoded ? "cursor-pointer select-none" : "" %>">
+
+    <%# Kind icon — matches expense row style %>
+    <div class="shrink-0 w-9 flex items-start justify-center pt-0.5 <%= icon_class %>">
+      <%= trip_item_kind_icon(item.kind, css_class: "h-7 w-7") %>
+    </div>
+
+    <%# Text %>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2">
+        <p class="text-sm font-semibold text-base-content truncate flex-1"><%= item.name %></p>
+      </div>
+      <% if item.when_label %>
+        <p class="text-xs text-base-content/40 mt-0.5"><%= item.when_label %></p>
+      <% elsif item.address.present? %>
+        <p class="text-xs text-base-content/40 mt-0.5 truncate"><%= item.address %></p>
+      <% end %>
+    </div>
+
+  </div>
+
+  <%# Arrow — navigate to show page %>
+  <%= link_to trip_trip_item_path(trip, item),
+        class: "shrink-0 flex items-center justify-center w-11 self-stretch
+                border-l border-base-200 text-base-content/20
+                hover:text-primary hover:bg-base-300/50 rounded-r-xl transition-colors",
+        title: "View",
+        onclick: "event.stopPropagation()" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+    </svg>
+  <% end %>
+
+</div>

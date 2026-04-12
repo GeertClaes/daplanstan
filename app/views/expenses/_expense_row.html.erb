@@ -1,0 +1,38 @@
+<%# Reusable expense list row.
+    Locals: expense, trip
+%>
+<div class="flex items-stretch border-b border-base-content/8 last:border-b-0 hover:bg-base-300/30 transition-colors">
+
+  <%# Left tap target — opens expense show %>
+  <%= link_to trip_expense_path(trip, expense), class: "flex items-center gap-3 flex-1 min-w-0 px-4 py-3.5", data: { turbo_direction: "forward" } do %>
+
+    <%# Category icon %>
+    <div class="shrink-0 w-9 <%= expense.confirmed? ? "text-base-content/30" : "text-warning" %>">
+      <%= expense_category_icon(expense.category, css_class: "h-7 w-7") %>
+    </div>
+
+    <%# Amount + description + status %>
+    <div class="flex-1 min-w-0">
+      <p class="font-mono font-bold text-base leading-tight <%= expense.confirmed? ? "text-base-content/40" : "text-warning" %>">
+        <%= number_with_precision(expense.amount, precision: 2) %>
+        <span class="text-xs font-sans font-normal text-base-content/40"><%= expense.currency %></span>
+      </p>
+      <p class="text-sm truncate mt-0.5 <%= expense.confirmed? ? "text-base-content/30 line-through" : "text-base-content/70" %>">
+        <%= expense.description %>
+      </p>
+      <p class="text-[11px] mt-0.5 font-semibold tracking-wide <%= expense.confirmed? ? "text-base-content/30" : "text-warning" %>">
+        <%= expense.confirmed? ? "Paid" : "To Settle" %>
+      </p>
+    </div>
+
+    <%# Avatar + relative date + chevron %>
+    <div class="flex flex-col items-end gap-1.5 shrink-0">
+      <%= image_tag expense.paid_by.avatar(size: 32),
+            class: "w-7 h-7 rounded-full", referrerpolicy: "no-referrer" %>
+      <p class="text-[11px] text-base-content/40"><%= relative_expense_date(expense.expense_date) %></p>
+      <span class="text-base-content/25 text-sm leading-none">›</span>
+    </div>
+
+  <% end %>
+
+</div>

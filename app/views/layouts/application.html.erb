@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for(:title) || "DaPlanStan" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="application-name" content="DaPlanStan">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0a0f1c">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <%# h-dvh = dynamic viewport height (accounts for mobile browser chrome) %>
+  <body data-theme="<%= current_user&.theme.presence || "stan" %>"
+        class="bg-base-100 flex flex-col h-dvh overflow-hidden">
+
+    <%# Navbar is hidden on expense detail/form pages which supply their own nav %>
+    <% unless content_for?(:hide_navbar) %>
+      <%= render "layouts/navbar" %>
+    <% end %>
+
+    <%# FAB — injected by pages that need it %>
+    <% if content_for?(:fab) %>
+      <div class="fixed bottom-6 right-5 z-30 pointer-events-none">
+        <div class="pointer-events-auto">
+          <%= yield :fab %>
+        </div>
+      </div>
+    <% end %>
+
+    <%# Flash messages %>
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-sm px-4 pointer-events-none">
+      <% if notice %>
+        <div class="alert alert-success shadow-lg pointer-events-auto" data-controller="flash">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <span><%= notice %></span>
+        </div>
+      <% end %>
+      <% if alert %>
+        <div class="alert alert-error shadow-lg pointer-events-auto" data-controller="flash">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <span><%= alert %></span>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Page content — min-h-0 so flex-1 can shrink correctly in the h-dvh chain %>
+    <main class="flex-1 min-h-0 <%= content_for?(:main_class) ? yield(:main_class) : "overflow-y-auto pb-6" %>">
+      <%= yield %>
+    </main>
+
+  </body>
+</html>

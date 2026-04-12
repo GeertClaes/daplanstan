@@ -1,0 +1,50 @@
+<%# Shared inner content for a timeline row (date + icon + text) %>
+
+<%# Date column %>
+<div class="text-right w-9 shrink-0 pt-0.5">
+  <% date = event[:date] %>
+  <% if date %>
+    <p class="text-[9px] font-semibold text-base-content/40 uppercase leading-none tracking-wide"><%= date.strftime("%b") %></p>
+    <p class="text-lg font-bold leading-tight text-base-content/70"><%= date.strftime("%-d") %></p>
+  <% end %>
+</div>
+
+<%# Icon %>
+<div class="shrink-0 mt-1.5 flex items-center justify-center text-primary">
+  <% if event[:type] == :accommodation %>
+    <%= inline_svg "Stay.svg", css_class: "h-5 w-5" %>
+  <% elsif event[:type] == :travel_leg %>
+    <%= travel_mode_icon(r.mode, css_class: "h-5 w-5") %>
+  <% elsif event[:type] == :booking %>
+    <%= booking_icon(r.booking_type, css_class: "h-5 w-5") %>
+  <% end %>
+</div>
+
+<%# Content %>
+<div class="flex-1 min-w-0">
+  <p class="text-sm font-semibold leading-snug truncate text-base-content">
+    <%= timeline_location(event) %>
+  </p>
+
+  <% if event[:type] == :accommodation %>
+    <p class="text-xs text-base-content/60 leading-snug truncate"><%= r.name %></p>
+    <p class="text-xs text-base-content/40 leading-snug mt-0.5">
+      <%= r.check_in.strftime(r.check_in.hour > 0 ? "%b %-d %H:%M" : "%b %-d") %>
+      → <%= r.check_out.strftime(r.check_out.hour > 0 ? "%b %-d %H:%M" : "%b %-d") %>
+      <% if r.address.present? %> · <%= r.address.split(",").first %><% end %>
+    </p>
+  <% elsif event[:type] == :travel_leg %>
+    <p class="text-xs text-base-content/60 leading-snug truncate">
+      <%= [r.carrier.presence, r.booking_reference.presence].compact.join(" ") %>
+    </p>
+    <p class="text-xs text-base-content/40 leading-snug mt-0.5">
+      <%= r.departure_datetime.strftime("%H:%M") %> → <%= r.arrival_datetime.strftime("%H:%M") %>
+      · <%= r.departure_location %> → <%= r.arrival_location %>
+    </p>
+  <% elsif event[:type] == :booking %>
+    <p class="text-xs text-base-content/60 leading-snug truncate"><%= r.booking_type.humanize %></p>
+    <% if r.datetime %>
+      <p class="text-xs text-base-content/40 leading-snug mt-0.5"><%= r.datetime.strftime("%b %-d, %H:%M") %></p>
+    <% end %>
+  <% end %>
+</div>

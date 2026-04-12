@@ -1,0 +1,38 @@
+<%# timeline: ActiveRecord collection of TripItems, trip: Trip %>
+
+<% if trip_items.empty? %>
+  <div class="text-center text-base-content/40 py-12 px-4">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-3 text-base-content/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+    </svg>
+    <p class="text-sm">No stops yet.</p>
+    <p class="text-xs mt-1 text-base-content/30">Forward confirmation emails or add a stop manually.</p>
+  </div>
+<% else %>
+  <div data-controller="timeline" class="py-3 space-y-0.5 px-2">
+    <%# Group by date — items without a date go under a nil group at the end %>
+    <% grouped = trip_items.group_by { |i| i.starts_at&.to_date } %>
+    <% sorted_dates = grouped.keys.compact.sort + (grouped.key?(nil) ? [nil] : []) %>
+
+    <% sorted_dates.each do |date| %>
+      <% items_on_day = grouped[date] %>
+
+      <%# Date separator %>
+      <% if date %>
+        <div class="px-3 pt-3 pb-1">
+          <p class="text-[10px] font-semibold uppercase tracking-wider text-base-content/30">
+            <%= date.strftime("%-d %B") %>
+          </p>
+        </div>
+      <% else %>
+        <div class="px-3 pt-3 pb-1">
+          <p class="text-[10px] font-semibold uppercase tracking-wider text-base-content/20">No date</p>
+        </div>
+      <% end %>
+
+      <% items_on_day.each do |item| %>
+        <%= render "trip_items/item_row", item: item, trip: trip %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

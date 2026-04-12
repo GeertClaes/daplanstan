@@ -1,0 +1,13 @@
+Hi,
+
+Someone sent an email to your trip "<%= @trip.title %>" from an address that isn't on the approved senders list.
+
+From:    <%= @inbox_item.from_name.presence || @inbox_item.from_email %>
+Email:   <%= @inbox_item.from_email %>
+Subject: <%= @inbox_item.subject %>
+Sent:    <%= @inbox_item.received_at.strftime("%d %b %Y %H:%M") %>
+
+To approve this sender so their future emails are processed automatically, visit:
+<%= trip_approved_senders_url(@trip) %>
+
+-- Daplanstan
