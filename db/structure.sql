@@ -15,7 +15,7 @@ FOREIGN KEY ("blob_id")
 CREATE UNIQUE INDEX "index_active_storage_variant_records_uniqueness" ON "active_storage_variant_records" ("blob_id", "variation_digest") /*application='Daplanstan'*/;
 CREATE TABLE IF NOT EXISTS "action_mailbox_inbound_emails" ("id" uuid NOT NULL PRIMARY KEY, "status" integer DEFAULT 0 NOT NULL, "message_id" varchar NOT NULL, "message_checksum" varchar NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE UNIQUE INDEX "index_action_mailbox_inbound_emails_uniqueness" ON "action_mailbox_inbound_emails" ("message_id", "message_checksum") /*application='Daplanstan'*/;
-CREATE TABLE IF NOT EXISTS "users" ("id" uuid NOT NULL PRIMARY KEY, "name" varchar NOT NULL, "email" varchar NOT NULL, "avatar_url" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "theme" varchar DEFAULT 'midnight' NOT NULL /*application='Daplanstan'*/);
+CREATE TABLE IF NOT EXISTS "users" ("id" uuid NOT NULL PRIMARY KEY, "name" varchar NOT NULL, "email" varchar NOT NULL, "avatar_url" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "theme" varchar DEFAULT 'midnight' NOT NULL /*application='Daplanstan'*/, "admin" boolean DEFAULT FALSE NOT NULL /*application='Daplanstan'*/);
 CREATE UNIQUE INDEX "index_users_on_email" ON "users" ("email") /*application='Daplanstan'*/;
 CREATE TABLE IF NOT EXISTS "user_identities" ("id" uuid NOT NULL PRIMARY KEY, "user_id" uuid NOT NULL, "provider" varchar NOT NULL, "provider_uid" varchar NOT NULL, "provider_email" varchar, "access_token" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_684b0e1ce0"
 FOREIGN KEY ("user_id")
@@ -134,6 +134,7 @@ CREATE INDEX "index_media_items_on_trip_id" ON "media_items" ("trip_id") /*appli
 CREATE INDEX "index_media_items_on_uploaded_by_id" ON "media_items" ("uploaded_by_id") /*application='Daplanstan'*/;
 CREATE INDEX "index_media_items_on_trip_id_and_taken_at" ON "media_items" ("trip_id", "taken_at") /*application='Daplanstan'*/;
 INSERT INTO "schema_migrations" (version) VALUES
+('20260415044043'),
 ('20260411144752'),
 ('20260409000002'),
 ('20260409000001'),

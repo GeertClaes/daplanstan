@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Admin · DaPlanStan</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body data-theme="<%= current_user&.theme.presence || "stan" %>"
+        class="bg-base-100 text-base-content min-h-screen">
+
+    <%# Top bar %>
+    <header class="sticky top-0 z-10 bg-base-200 border-b border-base-content/10 px-6 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <span class="font-black text-base-content/40 text-xs uppercase tracking-widest">Admin</span>
+        <nav class="flex items-center gap-1">
+          <%= link_to "Dashboard", admin_root_path,
+                class: "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors #{controller_name == "dashboard" ? "bg-primary/10 text-primary" : "text-base-content/50 hover:text-base-content hover:bg-base-300"}" %>
+          <%= link_to "Invites", admin_invites_path,
+                class: "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors #{controller_name == "invites" ? "bg-primary/10 text-primary" : "text-base-content/50 hover:text-base-content hover:bg-base-300"}" %>
+        </nav>
+      </div>
+      <%= link_to trips_path, class: "text-xs text-base-content/40 hover:text-base-content transition-colors" do %>
+        ← Back to app
+      <% end %>
+    </header>
+
+    <%# Flash %>
+    <% if notice %>
+      <div class="mx-6 mt-4 alert alert-success"><span><%= notice %></span></div>
+    <% end %>
+    <% if alert %>
+      <div class="mx-6 mt-4 alert alert-error"><span><%= alert %></span></div>
+    <% end %>
+
+    <main class="max-w-5xl mx-auto px-6 py-8">
+      <%= yield %>
+    </main>
+
+  </body>
+</html>

@@ -16,6 +16,8 @@ class User < ApplicationRecord
   has_many :created_trips,   class_name: "Trip",   foreign_key: :created_by_id, dependent: :destroy
   has_many :created_invites, class_name: "Invite", foreign_key: :created_by_id, dependent: :destroy
 
+  scope :admins, -> { where(admin: true) }
+
   validates :name, presence: true
   validates :email, presence: true, uniqueness: true
 

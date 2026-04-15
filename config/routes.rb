@@ -46,7 +46,11 @@ Rails.application.routes.draw do
 
     resource :settings, only: [ :show, :edit, :update ] do
       resources :travelers, only: [ :create, :update, :destroy ]
-      resources :invites,   only: [ :index, :create, :destroy ]
+    end
+
+    namespace :admin do
+      root to: "dashboard#index"
+      resources :invites, only: [ :index, :create, :destroy ]
     end
   end
 

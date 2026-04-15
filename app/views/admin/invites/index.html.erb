@@ -1,0 +1,76 @@
+<div class="flex items-center justify-between mb-8">
+  <h1 class="text-2xl font-bold">Beta Invites</h1>
+  <p class="text-sm text-base-content/40"><%= @invites.count %> total · <%= @invites.select(&:used?).count %> used · <%= @invites.select(&:usable?).count %> active</p>
+</div>
+
+<%# ── New invite form ── %>
+<div class="bg-base-200 rounded-2xl border border-base-content/10 p-5 mb-8">
+  <p class="text-xs font-semibold uppercase tracking-widest text-base-content/40 mb-4">Create invite</p>
+  <%= form_with url: admin_invites_path, class: "flex flex-wrap gap-3 items-end" do |f| %>
+    <div class="flex-1 min-w-48">
+      <%= f.label :note, "Label", class: "block text-xs text-base-content/50 mb-1" %>
+      <%= f.text_field :note, placeholder: "e.g. for Sarah",
+            class: "input input-bordered w-full input-sm" %>
+    </div>
+    <div class="flex-1 min-w-48">
+      <%= f.label :email, "Restrict to email (optional)", class: "block text-xs text-base-content/50 mb-1" %>
+      <%= f.email_field :email, placeholder: "Leave blank for generic link",
+            class: "input input-bordered w-full input-sm" %>
+    </div>
+    <div>
+      <%= f.label :expires_at, "Expires (optional)", class: "block text-xs text-base-content/50 mb-1" %>
+      <%= f.date_field :expires_at, class: "input input-bordered input-sm" %>
+    </div>
+    <%= f.submit "Generate invite", class: "btn btn-primary btn-sm self-end" %>
+  <% end %>
+</div>
+
+<%# ── Invite list ── %>
+<div class="bg-base-200 rounded-2xl border border-base-content/10 overflow-hidden">
+  <% if @invites.any? %>
+    <% @invites.each do |invite| %>
+      <div class="flex items-start gap-4 px-5 py-4 border-b border-base-content/5 last:border-b-0">
+        <div class="flex-1 min-w-0">
+          <% if invite.note.present? %>
+            <p class="text-sm font-semibold"><%= invite.note %></p>
+          <% end %>
+          <% if invite.email.present? %>
+            <p class="text-xs text-base-content/40 mt-0.5">Restricted to <%= invite.email %></p>
+          <% end %>
+          <div class="flex items-center gap-2 mt-2 bg-base-300 rounded-lg px-3 py-2">
+            <p class="font-mono text-xs text-base-content/50 flex-1 truncate select-all">
+              <%= accept_invite_url(invite.token) %>
+            </p>
+            <button type="button"
+                    class="text-xs text-primary hover:underline shrink-0"
+                    onclick="navigator.clipboard.writeText('<%= accept_invite_url(invite.token) %>'); this.textContent='Copied!'; setTimeout(()=>this.textContent='Copy',2000)">
+              Copy
+            </button>
+          </div>
+          <p class="text-xs text-base-content/30 mt-1.5">Created <%= invite.created_at.strftime("%d %b %Y") %> by <%= invite.created_by.name %></p>
+        </div>
+
+        <div class="flex flex-col items-end gap-2 shrink-0 pt-0.5">
+          <% if invite.used? %>
+            <span class="badge badge-success badge-sm">Used</span>
+            <p class="text-xs text-base-content/40"><%= invite.used_by&.name %></p>
+            <p class="text-xs text-base-content/30"><%= invite.used_at&.strftime("%d %b %Y") %></p>
+          <% elsif invite.expired? %>
+            <span class="badge badge-warning badge-sm">Expired</span>
+          <% else %>
+            <span class="badge badge-primary badge-sm">Pending</span>
+            <%= button_to admin_invite_path(invite), method: :delete,
+                  class: "text-xs text-base-content/30 hover:text-error transition-colors",
+                  data: { turbo_confirm: "Revoke this invite?" } do %>
+              Revoke
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="px-5 py-12 text-center">
+      <p class="text-sm text-base-content/30">No invites yet.</p>
+    </div>
+  <% end %>
+</div>

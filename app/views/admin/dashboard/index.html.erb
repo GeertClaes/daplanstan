@@ -1,0 +1,80 @@
+<h1 class="text-2xl font-bold mb-8">Dashboard</h1>
+
+<%# ── Stat cards ── %>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+
+  <div class="bg-base-200 rounded-2xl p-5 border border-base-content/10">
+    <p class="text-xs text-base-content/40 font-semibold uppercase tracking-widest mb-1">Users</p>
+    <p class="text-3xl font-black"><%= @user_count %></p>
+  </div>
+
+  <div class="bg-base-200 rounded-2xl p-5 border border-base-content/10">
+    <p class="text-xs text-base-content/40 font-semibold uppercase tracking-widest mb-1">Trips</p>
+    <p class="text-3xl font-black"><%= @trip_count %></p>
+  </div>
+
+  <div class="bg-base-200 rounded-2xl p-5 border border-base-content/10">
+    <p class="text-xs text-base-content/40 font-semibold uppercase tracking-widest mb-1">Trip Items</p>
+    <p class="text-3xl font-black"><%= @item_count %></p>
+  </div>
+
+  <div class="bg-base-200 rounded-2xl p-5 border border-base-content/10">
+    <p class="text-xs text-base-content/40 font-semibold uppercase tracking-widest mb-1">Expenses</p>
+    <p class="text-3xl font-black"><%= @expense_count %></p>
+  </div>
+
+  <div class="bg-base-200 rounded-2xl p-5 border border-base-content/10">
+    <p class="text-xs text-base-content/40 font-semibold uppercase tracking-widest mb-1">Inbox Items</p>
+    <p class="text-3xl font-black"><%= @inbox_total %></p>
+    <% if @inbox_pending > 0 %>
+      <p class="text-xs text-warning mt-1"><%= @inbox_pending %> pending review</p>
+    <% end %>
+  </div>
+
+  <div class="bg-base-200 rounded-2xl p-5 border border-base-content/10">
+    <p class="text-xs text-base-content/40 font-semibold uppercase tracking-widest mb-1">Invites</p>
+    <p class="text-3xl font-black"><%= @invite_pending + @invite_used %></p>
+    <p class="text-xs text-base-content/40 mt-1"><%= @invite_pending %> pending · <%= @invite_used %> used</p>
+  </div>
+
+</div>
+
+<%# ── Two columns: recent users + recent trips ── %>
+<div class="grid md:grid-cols-2 gap-6">
+
+  <%# Recent users %>
+  <div class="bg-base-200 rounded-2xl border border-base-content/10 overflow-hidden">
+    <div class="px-5 py-4 border-b border-base-content/10 flex items-center justify-between">
+      <p class="text-xs font-semibold uppercase tracking-widest text-base-content/40">Recent Users</p>
+      <p class="text-xs text-base-content/30"><%= @user_count %> total</p>
+    </div>
+    <% @recent_users.each do |user| %>
+      <div class="flex items-center gap-3 px-5 py-3 border-b border-base-content/5 last:border-b-0">
+        <img src="<%= user.avatar(size: 32) %>" class="w-7 h-7 rounded-full shrink-0" />
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium truncate"><%= user.name %></p>
+          <p class="text-xs text-base-content/40 truncate"><%= user.email %></p>
+        </div>
+        <p class="text-xs text-base-content/30 shrink-0"><%= user.created_at.strftime("%d %b") %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Recent trips %>
+  <div class="bg-base-200 rounded-2xl border border-base-content/10 overflow-hidden">
+    <div class="px-5 py-4 border-b border-base-content/10 flex items-center justify-between">
+      <p class="text-xs font-semibold uppercase tracking-widest text-base-content/40">Recent Trips</p>
+      <p class="text-xs text-base-content/30"><%= @trip_count %> total</p>
+    </div>
+    <% @recent_trips.each do |trip| %>
+      <div class="flex items-center gap-3 px-5 py-3 border-b border-base-content/5 last:border-b-0">
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium truncate"><%= trip.title %></p>
+          <p class="text-xs text-base-content/40"><%= trip.start_date.strftime("%d %b %Y") %> – <%= trip.end_date.strftime("%d %b %Y") %></p>
+        </div>
+        <p class="text-xs text-base-content/30 shrink-0"><%= trip.created_at.strftime("%d %b") %></p>
+      </div>
+    <% end %>
+  </div>
+
+</div>
