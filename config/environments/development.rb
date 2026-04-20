@@ -86,6 +86,10 @@ Rails.application.configure do
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
 
+  # When running behind an SSL-terminating proxy (e.g. Cloudflare tunnel), set
+  # ASSUME_SSL=true in .env so OmniAuth generates https:// callback URLs.
+  config.assume_ssl = ENV["ASSUME_SSL"] == "true"
+
   # Allow all hostnames used in development.
   config.hosts << "whats.daplanstan.com"
   config.hosts << "localhost"

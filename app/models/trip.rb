@@ -33,6 +33,6 @@ class Trip < ApplicationRecord
   end
 
   def build_inbound_email
-    "#{title.parameterize}-#{SecureRandom.hex(4)}@#{ENV.fetch("TRIP_EMAIL_DOMAIN", "whats.example.com")}"
+    "#{title.parameterize}-#{SecureRandom.hex(4)}@#{ENV.fetch("TRIP_EMAIL_DOMAIN", "whats.yourdomain.com")}"
   end
 end
