@@ -80,4 +80,7 @@ Rails.application.configure do
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   config.hosts << "whats.daplanstan.com"
+
+  # Allow the kamal-proxy health check, which hits /up using the container hostname.
+  config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 end
