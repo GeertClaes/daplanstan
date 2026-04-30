@@ -11,18 +11,11 @@ See MISSION.md, APPROACH.md, and DATA_MODEL.md for full context.
 
 ```bash
 bundle install
-
-# DaisyUI plugin (gitignored — re-download after every fresh clone)
-mkdir -p app/assets/tailwind/plugins
-curl -sL -o app/assets/tailwind/plugins/daisyui.js https://cdn.jsdelivr.net/npm/daisyui@5/+esm
-
 cp .env.example .env   # fill in credentials
 bin/rails db:encryption:init
 bin/rails db:create db:migrate db:seed
 bin/dev
 ```
-
-If Tailwind exits with `Can't resolve './plugins/daisyui.js'`, the DaisyUI file is missing — run the two `mkdir`/`curl` commands above.
 
 ---
 

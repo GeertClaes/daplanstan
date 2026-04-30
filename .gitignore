@@ -37,9 +37,6 @@
 /app/assets/builds/*
 !/app/assets/builds/.keep
 
-# DaisyUI plugin (downloaded via curl, not committed)
-/app/assets/tailwind/plugins/
-
 # Claude Code
 .claude/
 
