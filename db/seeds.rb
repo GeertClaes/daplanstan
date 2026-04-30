@@ -60,16 +60,23 @@ end
   { kind: "do",     status: "idea",      name: "Roman Amphitheatre of Lecce",          starts_at: "2026-06-22 10:00", ends_at: nil,                address: "Piazza Sant'Oronzo, 73100 Lecce",                        latitude: nil,     longitude: nil,     notes: "2nd century AD amphitheatre right in the city centre. Free to view from the piazza" },
   { kind: "eat",    status: "idea",      name: "Cucina Casareccia",                    starts_at: "2026-06-22 13:00", ends_at: nil,                address: "Via Costadura 19, Lecce",                                latitude: nil,     longitude: nil,     notes: "Home cooking at its best — grandmother's recipes, no menu, just what she cooked that day" },
   { kind: "flight", status: "confirmed", name: "Ryanair Bari → Düsseldorf (Weeze)",   starts_at: "2026-06-23 16:30", ends_at: "2026-06-23 18:55", address: "Bari, Italy",                                            latitude: 41.1258, longitude: 16.8620, notes: nil }
-].each do |attrs|
-  TripItem.find_or_create_by!(trip: trip, name: attrs[:name], starts_at: attrs[:starts_at]) do |i|
-    i.kind       = attrs[:kind]
-    i.status     = attrs[:status]
-    i.ends_at    = attrs[:ends_at]
-    i.address    = attrs[:address]
-    i.latitude   = attrs[:latitude]
-    i.longitude  = attrs[:longitude]
-    i.notes      = attrs[:notes]
-    i.added_by   = user
+].then do |trip_items|
+  begin
+    TripItem.skip_callback(:save, :after, :geocode_from_address)
+    trip_items.each do |attrs|
+      TripItem.find_or_create_by!(trip: trip, name: attrs[:name], starts_at: attrs[:starts_at]) do |i|
+        i.kind       = attrs[:kind]
+        i.status     = attrs[:status]
+        i.ends_at    = attrs[:ends_at]
+        i.address    = attrs[:address]
+        i.latitude   = attrs[:latitude]
+        i.longitude  = attrs[:longitude]
+        i.notes      = attrs[:notes]
+        i.added_by   = user
+      end
+    end
+  ensure
+    TripItem.set_callback(:save, :after, :geocode_from_address)
   end
 end
 
