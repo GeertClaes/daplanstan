@@ -95,8 +95,8 @@ end
     e.currency     = attrs[:currency]
     e.expense_date = attrs[:expense_date]
     e.category     = attrs[:category]
-    e.confirmed    = true
-    e.paid_by      = traveler
+    e.confirmed_at  = Time.current
+    e.paid_by_traveler = traveler
   end
 end
 

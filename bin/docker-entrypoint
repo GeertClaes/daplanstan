@@ -3,6 +3,12 @@
 # If running the rails server then create or migrate existing database
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
   ./bin/rails db:prepare
+
+  # Load schemas for auxiliary databases (queue/cache/cable) on first deploy.
+  # These use schema files rather than migrations, so db:prepare won't set them up.
+  if ! sqlite3 storage/production_queue.sqlite3 ".tables" 2>/dev/null | grep -q "solid_queue_jobs"; then
+    DISABLE_DATABASE_ENVIRONMENT_CHECK=1 ./bin/rails db:schema:load:queue db:schema:load:cache db:schema:load:cable
+  fi
 fi
 
 exec "${@}"
