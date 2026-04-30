@@ -37,6 +37,9 @@
 /app/assets/builds/*
 !/app/assets/builds/.keep
 
+# Kamal local secrets (never commit)
+/.kamal/secrets.local
+
 # Claude Code
 .claude/
 
