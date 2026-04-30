@@ -26,6 +26,7 @@ env:
     - RAILS_MASTER_KEY
     - GOOGLE_CLIENT_ID
     - GOOGLE_CLIENT_SECRET
+    - POSTMARK_API_TOKEN
   clear:
     SOLID_QUEUE_IN_PUMA: true
 
