@@ -30,8 +30,12 @@ env:
     - ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
     - ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
     - ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
+    - RAILS_INBOUND_EMAIL_PASSWORD
+    - ANTHROPIC_API_KEY
+    - PEXELS_API_KEY
   clear:
     SOLID_QUEUE_IN_PUMA: true
+    TRIP_EMAIL_DOMAIN: mail.daplanstan.com
 
 aliases:
   console: app exec --interactive --reuse "bin/rails console"

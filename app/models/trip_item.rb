@@ -4,7 +4,7 @@ class TripItem < ApplicationRecord
   belongs_to :trip
   belongs_to :added_by, class_name: "User"
   belongs_to :inbox_item, optional: true
-  has_one :expense
+  has_one :expense, dependent: :nullify
 
   enum :kind, {
     stay:    "stay",
