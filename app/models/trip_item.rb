@@ -25,6 +25,7 @@ class TripItem < ApplicationRecord
 
   validates :name, presence: true
   validates :kind, presence: true
+  validates :url, format: { with: /\Ahttps?:\/\/.+/i, message: "must start with http:// or https://" }, allow_blank: true
 
   TRANSPORT_KINDS = %w[flight car train ferry].freeze
 
