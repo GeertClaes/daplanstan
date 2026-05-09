@@ -134,7 +134,13 @@ class TripItemsController < ApplicationController
     TripItem.skip_callback(:save, :after, :geocode_from_address)
     items.each do |data|
       next skipped    += 1 if data["name"].blank?
-      next duplicates += 1 if existing_names.include?(data["name"].downcase)
+      if existing_names.include?(data["name"].downcase)
+        if data["lat"].present? && data["lng"].present?
+          existing = @trip.trip_items.find_by("lower(name) = ?", data["name"].downcase)
+          existing.update_columns(latitude: data["lat"], longitude: data["lng"]) if existing && !existing.geocoded?
+        end
+        next duplicates += 1
+      end
       item = @trip.trip_items.create!(
         name:      data["name"],
         kind:      VALID_IMPORT_KINDS.include?(data["kind"].to_s) ? data["kind"].to_s : "other",
