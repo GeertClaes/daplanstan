@@ -10,7 +10,7 @@ class TripsController < ApplicationController
 
   def show
     @trip_items = @trip.trip_items
-                       .order(Arel.sql("starts_at IS NULL, starts_at ASC, created_at ASC"))
+                       .order(Arel.sql("CASE WHEN status = 'confirmed' THEN 0 ELSE 1 END, starts_at IS NULL, starts_at ASC, created_at ASC"))
     @expenses = @trip.expenses
                      .includes(:paid_by, :confirmed_by, :trip_item)
                      .sort_by { |e| expense_sort_time(e) }

@@ -5,8 +5,9 @@
 <% icon_class = item.confirmed? ? "text-primary" : "text-base-content/30" %>
 
 <div class="flex items-stretch rounded-xl transition-all duration-150 group hover:bg-base-200 border-b border-base-content/8 last:border-b-0"
+     data-kind="<%= item.kind %>"
+     data-timeline-target="<%= geocoded ? "row item" : "row" %>"
      <% if geocoded %>
-       data-timeline-target="item"
        data-selected="false"
        data-action="click->timeline#select"
        data-lat="<%= item.latitude %>"

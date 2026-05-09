@@ -126,6 +126,9 @@ class TripItemsController < ApplicationController
   def bulk_create_items(items)
     created = 0
     skipped = 0
+    # Geocoding makes one external HTTP call per item — skip during bulk import
+    # to avoid request timeouts. Items geocode lazily on first save with an address change.
+    TripItem.skip_callback(:save, :after, :geocode_from_address)
     items.each do |data|
       next skipped += 1 if data["name"].blank?
       @trip.trip_items.create!(
@@ -146,6 +149,8 @@ class TripItemsController < ApplicationController
       skipped += 1
     end
     { created: created, skipped: skipped }
+  ensure
+    TripItem.set_callback(:save, :after, :geocode_from_address)
   end
 
   def parse_import_time(val)

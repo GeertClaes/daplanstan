@@ -9,30 +9,93 @@
     <p class="text-xs mt-1 text-base-content/30">Forward confirmation emails or add a stop manually.</p>
   </div>
 <% else %>
-  <div data-controller="timeline" class="py-3 space-y-0.5 px-2">
-    <%# Group by date — items without a date go under a nil group at the end %>
-    <% grouped = trip_items.group_by { |i| i.starts_at&.to_date } %>
-    <% sorted_dates = grouped.keys.compact.sort + (grouped.key?(nil) ? [nil] : []) %>
+  <%
+    confirmed_items = trip_items.select(&:confirmed?)
+    idea_items      = trip_items.select(&:idea?)
+    present_kinds   = trip_items.map(&:kind).uniq
+  %>
 
-    <% sorted_dates.each do |date| %>
-      <% items_on_day = grouped[date] %>
+  <div data-controller="timeline" class="flex flex-col min-h-0">
 
-      <%# Date separator %>
-      <% if date %>
-        <div class="px-3 pt-3 pb-1">
-          <p class="text-[10px] font-semibold uppercase tracking-wider text-base-content/30">
-            <%= date.strftime("%-d %B") %>
-          </p>
-        </div>
-      <% else %>
-        <div class="px-3 pt-3 pb-1">
-          <p class="text-[10px] font-semibold uppercase tracking-wider text-base-content/20">No date</p>
-        </div>
-      <% end %>
-
-      <% items_on_day.each do |item| %>
-        <%= render "trip_items/item_row", item: item, trip: trip %>
-      <% end %>
+    <%# ── Filter bar — only shown when 2+ kinds present ── %>
+    <% if present_kinds.size > 1 %>
+      <div class="flex gap-1.5 px-3 py-2.5 border-b border-base-content/8 overflow-x-auto shrink-0 scrollbar-none">
+        <button class="shrink-0 text-[11px] font-semibold px-3 py-1 rounded-full bg-primary text-primary-content transition-colors"
+                data-kind="all"
+                data-timeline-target="filterBtn"
+                data-action="click->timeline#filter">
+          All
+        </button>
+        <% TripItem.kinds.keys.each do |kind| %>
+          <% next unless present_kinds.include?(kind) %>
+          <button class="shrink-0 text-[11px] font-semibold px-3 py-1 rounded-full bg-base-300 text-base-content/60 transition-colors"
+                  data-kind="<%= kind %>"
+                  data-timeline-target="filterBtn"
+                  data-action="click->timeline#filter">
+            <%= trip_item_kind_label(kind) %>
+          </button>
+        <% end %>
+      </div>
     <% end %>
+
+    <%# ── Scrollable list ── %>
+    <div class="flex-1 overflow-y-auto pb-6 px-2">
+
+      <%# ── Confirmed section ── %>
+      <% if confirmed_items.any? %>
+        <% grouped = confirmed_items.group_by { |i| i.starts_at&.to_date } %>
+        <% sorted_dates = grouped.keys.compact.sort + (grouped.key?(nil) ? [nil] : []) %>
+
+        <div class="pt-2 space-y-0.5">
+          <% sorted_dates.each do |date| %>
+            <div data-timeline-target="dateGroup">
+              <div class="px-3 pt-3 pb-1">
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-base-content/30">
+                  <%= date ? date.strftime("%-d %B") : "Date TBD" %>
+                </p>
+              </div>
+              <% grouped[date].each do |item| %>
+                <%= render "trip_items/item_row", item: item, trip: trip %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%# ── Ideas divider ── %>
+      <% if idea_items.any? %>
+        <div class="relative flex items-center gap-3 px-3 py-4 mt-2">
+          <div class="flex-1 h-px bg-base-content/10"></div>
+          <span class="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-base-content/30 shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+            </svg>
+            Ideas
+          </span>
+          <div class="flex-1 h-px bg-base-content/10"></div>
+        </div>
+
+        <% grouped = idea_items.group_by { |i| i.starts_at&.to_date } %>
+        <% sorted_dates = grouped.keys.compact.sort + (grouped.key?(nil) ? [nil] : []) %>
+
+        <div class="space-y-0.5">
+          <% sorted_dates.each do |date| %>
+            <div data-timeline-target="dateGroup">
+              <% if date %>
+                <div class="px-3 pt-3 pb-1">
+                  <p class="text-[10px] font-semibold uppercase tracking-wider text-base-content/30">
+                    <%= date.strftime("%-d %B") %>
+                  </p>
+                </div>
+              <% end %>
+              <% grouped[date].each do |item| %>
+                <%= render "trip_items/item_row", item: item, trip: trip %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+    </div>
   </div>
 <% end %>
