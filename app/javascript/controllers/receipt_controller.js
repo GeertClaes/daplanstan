@@ -23,4 +23,10 @@ export default class extends Controller {
       this.submitTarget.textContent = "Uploading…"
     }
   }
+
+  submitForm(event) {
+    const file = event.target.files[0]
+    if (!file) return
+    this.element.requestSubmit()
+  }
 }
