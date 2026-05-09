@@ -10,9 +10,11 @@
   </div>
 <% else %>
   <%
-    confirmed_items = trip_items.select(&:confirmed?)
-    idea_items      = trip_items.select(&:idea?)
-    present_kinds   = trip_items.map(&:kind).uniq
+    present_kinds = trip_items.map(&:kind).uniq
+    dated_items   = trip_items.select { |i| i.starts_at.present? }
+    undated_items = trip_items.select { |i| i.starts_at.nil? }
+    grouped       = dated_items.group_by { |i| i.starts_at.to_date }
+    sorted_dates  = grouped.keys.sort
   %>
 
   <div data-controller="timeline" class="flex flex-col min-h-0">
@@ -40,62 +42,37 @@
 
     <%# ── Scrollable list ── %>
     <div class="flex-1 overflow-y-auto pb-6 px-2">
+      <div class="pt-2 space-y-0.5">
 
-      <%# ── Confirmed section ── %>
-      <% if confirmed_items.any? %>
-        <% grouped = confirmed_items.group_by { |i| i.starts_at&.to_date } %>
-        <% sorted_dates = grouped.keys.compact.sort + (grouped.key?(nil) ? [nil] : []) %>
+        <%# Dated items grouped by day %>
+        <% sorted_dates.each do |date| %>
+          <div data-timeline-target="dateGroup">
+            <div class="px-3 pt-3 pb-1">
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-base-content/30">
+                <%= date.strftime("%-d %B") %>
+              </p>
+            </div>
+            <% grouped[date].each do |item| %>
+              <%= render "trip_items/item_row", item: item, trip: trip %>
+            <% end %>
+          </div>
+        <% end %>
 
-        <div class="pt-2 space-y-0.5">
-          <% sorted_dates.each do |date| %>
-            <div data-timeline-target="dateGroup">
+        <%# Undated items at the end %>
+        <% if undated_items.any? %>
+          <div data-timeline-target="dateGroup">
+            <% if sorted_dates.any? %>
               <div class="px-3 pt-3 pb-1">
-                <p class="text-[10px] font-semibold uppercase tracking-wider text-base-content/30">
-                  <%= date ? date.strftime("%-d %B") : "Date TBD" %>
-                </p>
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-base-content/30">Date TBD</p>
               </div>
-              <% grouped[date].each do |item| %>
-                <%= render "trip_items/item_row", item: item, trip: trip %>
-              <% end %>
-            </div>
-          <% end %>
-        </div>
-      <% end %>
+            <% end %>
+            <% undated_items.each do |item| %>
+              <%= render "trip_items/item_row", item: item, trip: trip %>
+            <% end %>
+          </div>
+        <% end %>
 
-      <%# ── Ideas divider ── %>
-      <% if idea_items.any? %>
-        <div class="relative flex items-center gap-3 px-3 py-4 mt-2">
-          <div class="flex-1 h-px bg-base-content/10"></div>
-          <span class="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-base-content/30 shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-            </svg>
-            Ideas
-          </span>
-          <div class="flex-1 h-px bg-base-content/10"></div>
-        </div>
-
-        <% grouped = idea_items.group_by { |i| i.starts_at&.to_date } %>
-        <% sorted_dates = grouped.keys.compact.sort + (grouped.key?(nil) ? [nil] : []) %>
-
-        <div class="space-y-0.5">
-          <% sorted_dates.each do |date| %>
-            <div data-timeline-target="dateGroup">
-              <% if date %>
-                <div class="px-3 pt-3 pb-1">
-                  <p class="text-[10px] font-semibold uppercase tracking-wider text-base-content/30">
-                    <%= date.strftime("%-d %B") %>
-                  </p>
-                </div>
-              <% end %>
-              <% grouped[date].each do |item| %>
-                <%= render "trip_items/item_row", item: item, trip: trip %>
-              <% end %>
-            </div>
-          <% end %>
-        </div>
-      <% end %>
-
+      </div>
     </div>
   </div>
 <% end %>
