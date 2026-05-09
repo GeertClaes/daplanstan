@@ -239,7 +239,7 @@ class InboxItem < ApplicationRecord
 
     if paid_by_traveler
       priced_leg = flight_items.find { |f| f[:data]["total_price"].present? }
-      if priced_leg && priced_leg[:item].expense.nil?
+      if priced_leg && !Expense.exists?(trip_item_id: priced_leg[:item].id)
         origins = legs_data.map { |l| l["departure_location"] }.uniq
         carrier = priced_leg[:data]["carrier"].presence
         desc    = origins.length > 1 ? "#{origins.first} ⇄ #{origins.last}" : origins.first.to_s
@@ -261,7 +261,7 @@ class InboxItem < ApplicationRecord
         confirmation_ref: acc["confirmation_number"],
         notes:            acc["notes"]
       })
-      if paid_by_traveler && acc["total_price"].present? && item.expense.nil?
+      if paid_by_traveler && acc["total_price"].present? && !Expense.exists?(trip_item_id: item.id)
         build_expense(item, added_by, paid_by_traveler,
                       acc["total_price"], acc["currency"], acc["name"],
                       :stay, acc["check_in"])
@@ -289,7 +289,7 @@ class InboxItem < ApplicationRecord
         confirmation_ref: booking["confirmation_reference"],
         notes:            booking["notes"]
       })
-      if paid_by_traveler && booking["total_price"].present? && item.expense.nil?
+      if paid_by_traveler && booking["total_price"].present? && !Expense.exists?(trip_item_id: item.id)
         build_expense(item, added_by, paid_by_traveler,
                       booking["total_price"], booking["currency"], booking["provider"],
                       kind.to_sym, booking["datetime"])

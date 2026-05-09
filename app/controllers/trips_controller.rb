@@ -1,7 +1,7 @@
 class TripsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_trip, only: [ :show ]
-  before_action :set_editable_trip, only: [ :edit, :update, :cover, :update_cover, :refresh_cover, :travelers ]
+  before_action :set_editable_trip, only: [ :edit, :update, :cover, :update_cover, :refresh_cover, :travelers, :geocode_missing ]
   before_action :set_owner_trip, only: [ :destroy, :regenerate_inbound_email ]
 
   def index
