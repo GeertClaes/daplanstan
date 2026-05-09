@@ -1,11 +1,10 @@
 <%# Hide global navbar — the card IS the screen %>
 <% content_for :hide_navbar, true %>
-<% content_for :main_class, "flex flex-col overflow-hidden" %>
 
 <%= form_with model: [@trip, item],
-      class: "flex-1 flex flex-col overflow-hidden" do |f| %>
+      class: "flex flex-col" do |f| %>
 
-  <%# ── Spacer (h-14 = 56px — matches nav band on show so cards are identical size) ── %>
+  <%# ── Nav band ── %>
   <div class="h-14 shrink-0 max-w-sm mx-auto w-full px-4 flex items-center justify-between">
     <div class="flex gap-2 flex-wrap">
       <% item.errors.full_messages.each do |msg| %>
@@ -19,12 +18,12 @@
   </div>
 
   <%# ── Card ── %>
-  <div class="flex-1 min-h-0 px-4 pb-4">
-    <div class="max-w-sm mx-auto h-full bg-base-200 border border-base-content/10 rounded-3xl
+  <div class="px-4 pb-8">
+    <div class="max-w-sm mx-auto bg-base-200 border border-base-content/10 rounded-3xl
                 overflow-visible flex flex-col">
 
       <%# ── TOP SECTION: kind icon + name ── %>
-      <div class="px-6 pt-5 pb-4 shrink-0 flex items-center gap-3">
+      <div class="px-6 pt-5 pb-4 flex items-center gap-3">
         <div class="shrink-0 w-11 h-11 rounded-xl bg-primary/15 text-primary flex items-center justify-center">
           <%= trip_item_kind_icon(item.kind.presence || "activity", css_class: "h-7 w-7") %>
         </div>
@@ -36,14 +35,14 @@
       </div>
 
       <%# ── PERFORATION 1 ── %>
-      <div class="relative flex items-center h-5 shrink-0">
+      <div class="relative flex items-center h-5">
         <div class="absolute -left-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
         <div class="flex-1 border-t-2 border-dashed border-base-content/15 mx-3"></div>
         <div class="absolute -right-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
       </div>
 
       <%# ── MIDDLE SECTION ── %>
-      <div class="flex-1 min-h-0 overflow-y-auto px-5 py-4 flex flex-col gap-4">
+      <div class="px-5 py-4 flex flex-col gap-4">
 
         <%# Kind picker %>
         <div class="pt-1">
@@ -141,14 +140,14 @@
       </div>
 
       <%# ── PERFORATION 2 ── %>
-      <div class="relative flex items-center h-5 shrink-0">
+      <div class="relative flex items-center h-5">
         <div class="absolute -left-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
         <div class="flex-1 border-t-2 border-dashed border-base-content/15 mx-3"></div>
         <div class="absolute -right-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
       </div>
 
       <%# ── BOTTOM SECTION: cancel + save ── %>
-      <div class="px-5 py-4 shrink-0 flex items-center justify-between">
+      <div class="px-5 py-4 flex items-center justify-between">
 
         <%# Cancel — grey X circle %>
         <%= link_to (item.new_record? ? trip_path(@trip, tab: "itinerary") : trip_trip_item_path(@trip, item)),
