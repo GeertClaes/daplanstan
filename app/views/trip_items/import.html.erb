@@ -130,12 +130,15 @@ Return ONLY a JSON array with no explanation or markdown:
   {
     "kind": "stay | eat | do | shop | other",
     "name": "Name of the place or activity",
-    "address": "City, Country (optional)",
+    "address": "Full address or city, country",
+    "lat": 40.1234,
+    "lng": 18.5678,
     "notes": "Any useful tips (optional)",
     "starts_at": "YYYY-MM-DDTHH:MM (optional)"
   }
 ]
 
+Include lat/lng coordinates for every place so it appears on the map.
 My trip: [DESCRIBE YOUR TRIP HERE]'>
           <div class="flex items-center justify-between mb-2">
             <p class="dp-label">Prompt template</p>
@@ -154,12 +157,15 @@ My trip: [DESCRIBE YOUR TRIP HERE]'>
   {
     "kind": "stay | eat | do | shop | other",
     "name": "...",
-    "address": "... (optional)",
+    "address": "Full address or city, country",
+    "lat": 40.1234,
+    "lng": 18.5678,
     "notes": "... (optional)",
     "starts_at": "YYYY-MM-DDTHH:MM (optional)"
   }
 ]
 
+Include lat/lng for every place.
 My trip: [DESCRIBE YOUR TRIP HERE]</div>
         </div>
 

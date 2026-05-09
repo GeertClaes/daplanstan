@@ -610,27 +610,30 @@
           <ul class="space-y-2 text-sm text-base-content/60 mb-6">
             <li class="flex items-center gap-2"><span class="text-primary">✓</span> Works with ChatGPT, Claude, Gemini — any AI</li>
             <li class="flex items-center gap-2"><span class="text-primary">✓</span> Imports as ideas, separate from confirmed bookings</li>
+            <li class="flex items-center gap-2"><span class="text-primary">✓</span> Places appear on the map instantly — no extra steps</li>
             <li class="flex items-center gap-2"><span class="text-primary">✓</span> The app gives you the exact prompt to copy</li>
           </ul>
           <div class="space-y-3">
             <div class="bg-base-300 rounded-2xl p-4 border border-base-content/10">
               <p class="text-xs text-base-content/40 font-semibold uppercase tracking-widest mb-2">1 — Copy this prompt into any AI</p>
-              <p class="text-sm text-primary/80 font-mono leading-relaxed">"Return ONLY a JSON array of things to do in Rome for a family of 4. Use this format exactly: [{&quot;kind&quot;: &quot;eat|do|stay|shop&quot;, &quot;name&quot;: &quot;...&quot;, &quot;address&quot;: &quot;...&quot;, &quot;notes&quot;: &quot;...&quot;}]"</p>
+              <p class="text-sm text-primary/80 font-mono leading-relaxed">"Return ONLY a JSON array of things to do in Rome for a family of 4. Include lat/lng coordinates for every place. Use this format exactly: [{&quot;kind&quot;: &quot;eat|do|stay|shop&quot;, &quot;name&quot;: &quot;...&quot;, &quot;address&quot;: &quot;...&quot;, &quot;lat&quot;: 41.9028, &quot;lng&quot;: 12.4964, &quot;notes&quot;: &quot;...&quot;}]"</p>
             </div>
             <div class="bg-base-300 rounded-2xl p-4 border border-base-content/10">
               <p class="text-xs text-base-content/40 font-semibold uppercase tracking-widest mb-2">2 — AI returns JSON like this</p>
               <pre class="text-xs text-success/80 font-mono leading-relaxed overflow-x-auto">[
   { "kind": "eat", "name": "Tonnarello",
     "address": "Via della Paglia 1, Rome",
+    "lat": 41.8954, "lng": 12.4705,
     "notes": "Classic cacio e pepe, book ahead" },
   { "kind": "do", "name": "Borghese Gallery",
     "address": "Piazzale Scipione Borghese 5",
+    "lat": 41.9142, "lng": 12.4922,
     "notes": "Timed entry, kids love the sculptures" }
 ]</pre>
             </div>
             <div class="bg-base-300 rounded-2xl p-4 border border-base-content/10">
               <p class="text-xs text-base-content/40 font-semibold uppercase tracking-widest mb-2">3 — Paste or upload into DaPlanStan</p>
-              <p class="text-sm text-base-content/60">All items appear as ideas on your itinerary. Review, keep the ones you like, delete the rest.</p>
+              <p class="text-sm text-base-content/60">All items appear as ideas on your itinerary with map pins already placed. Review, keep the ones you like, delete the rest.</p>
             </div>
           </div>
         </div>
