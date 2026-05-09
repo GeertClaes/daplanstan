@@ -1,0 +1,12 @@
+services:
+  web:
+    image: geertclaes/daplanstan:latest
+    ports:
+      - "3000:80"
+    env_file: .env
+    volumes:
+      - daplanstan_storage:/rails/storage
+    restart: unless-stopped
+
+volumes:
+  daplanstan_storage:
