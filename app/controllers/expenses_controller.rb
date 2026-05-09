@@ -55,11 +55,12 @@ class ExpensesController < ApplicationController
   end
 
   def update
-    paid_attrs = if params.dig(:expense, :mark_paid) == "1"
-      { confirmed_at: @expense.confirmed_at || Time.current,
-        confirmed_by: @expense.confirmed_by || current_user }
+    paid_attrs = if params[:expense]&.key?(:mark_paid)
+      params.dig(:expense, :mark_paid) == "1" ?
+        { confirmed_at: @expense.confirmed_at || Time.current, confirmed_by: @expense.confirmed_by || current_user } :
+        { confirmed_at: nil, confirmed_by: nil }
     else
-      { confirmed_at: nil, confirmed_by: nil }
+      {}
     end
 
     if @expense.update(expense_params.merge(paid_attrs))

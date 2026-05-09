@@ -199,6 +199,7 @@
 
         <%# Receipt — attach photo %>
         <%= form_with url: trip_expense_path(@trip, @expense), method: :patch,
+              scope: :expense, multipart: true,
               data: { controller: "receipt" }, class: "contents" do |f| %>
           <label class="flex flex-col items-center justify-center gap-0.5 px-4 h-14
                         text-base-content/60 hover:text-base-content hover:bg-base-300/60
