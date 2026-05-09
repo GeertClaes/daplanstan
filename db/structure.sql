@@ -88,7 +88,7 @@ FOREIGN KEY ("used_by_id")
 CREATE INDEX "index_invites_on_created_by_id" ON "invites" ("created_by_id") /*application='Daplanstan'*/;
 CREATE INDEX "index_invites_on_used_by_id" ON "invites" ("used_by_id") /*application='Daplanstan'*/;
 CREATE UNIQUE INDEX "index_invites_on_token" ON "invites" ("token") /*application='Daplanstan'*/;
-CREATE TABLE "trip_items" ("id" uuid NOT NULL PRIMARY KEY, "trip_id" uuid NOT NULL, "added_by_id" uuid NOT NULL, "inbox_item_id" uuid, "kind" varchar NOT NULL, "name" varchar NOT NULL, "status" varchar DEFAULT 'idea' NOT NULL, "notes" text, "starts_at" datetime(6), "ends_at" datetime(6), "address" varchar, "latitude" decimal(10,6), "longitude" decimal(10,6), "amount" decimal(10,2), "currency" varchar, "confirmation_ref" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_3dbcc92a4a"
+CREATE TABLE "trip_items" ("id" uuid NOT NULL PRIMARY KEY, "trip_id" uuid NOT NULL, "added_by_id" uuid NOT NULL, "inbox_item_id" uuid, "kind" varchar NOT NULL, "name" varchar NOT NULL, "status" varchar DEFAULT 'idea' NOT NULL, "notes" text, "starts_at" datetime(6), "ends_at" datetime(6), "address" varchar, "latitude" decimal(10,6), "longitude" decimal(10,6), "amount" decimal(10,2), "currency" varchar, "confirmation_ref" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "url" varchar /*application='Daplanstan'*/, CONSTRAINT "fk_rails_3dbcc92a4a"
 FOREIGN KEY ("trip_id")
   REFERENCES "trips" ("id")
 , CONSTRAINT "fk_rails_50694c0248"
@@ -134,6 +134,7 @@ CREATE INDEX "index_media_items_on_trip_id" ON "media_items" ("trip_id") /*appli
 CREATE INDEX "index_media_items_on_uploaded_by_id" ON "media_items" ("uploaded_by_id") /*application='Daplanstan'*/;
 CREATE INDEX "index_media_items_on_trip_id_and_taken_at" ON "media_items" ("trip_id", "taken_at") /*application='Daplanstan'*/;
 INSERT INTO "schema_migrations" (version) VALUES
+('20260509175443'),
 ('20260415044043'),
 ('20260411144752'),
 ('20260409000002'),

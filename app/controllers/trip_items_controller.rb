@@ -149,6 +149,7 @@ class TripItemsController < ApplicationController
         latitude:  data["lat"].presence,
         longitude: data["lng"].presence,
         notes:     data["notes"].presence,
+        url:       data["url"].presence,
         starts_at: parse_import_time(data["starts_at"]),
         ends_at:   parse_import_time(data["ends_at"]),
         amount:    data["amount"].presence,
@@ -179,7 +180,7 @@ class TripItemsController < ApplicationController
       :kind, :name, :status, :notes,
       :starts_at, :ends_at,
       :address, :latitude, :longitude,
-      :amount, :currency, :confirmation_ref
+      :amount, :currency, :confirmation_ref, :url
     )
   end
 end

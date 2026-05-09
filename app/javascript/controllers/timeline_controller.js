@@ -3,16 +3,16 @@ import { Controller } from "@hotwired/stimulus"
 const SELECTED = ["!bg-primary/15", "ring-1", "ring-primary/30", "ring-inset"]
 
 export default class extends Controller {
-  static targets = ["item", "row", "filterBtn", "dateGroup"]
+  static targets = ["item", "row", "filterBtn", "statusBtn", "dateGroup"]
 
-  activeFilter = "all"
+  activeKind   = "all"
+  activeStatus = "all"
 
   select(event) {
     const row       = event.currentTarget
     const wasSelected = row.dataset.selected === "true"
     const map       = document.getElementById("trip-map")
 
-    // Clear all selections
     this.itemTargets.forEach(item => {
       item.classList.remove(...SELECTED)
       item.dataset.selected = "false"
@@ -33,27 +33,50 @@ export default class extends Controller {
   }
 
   filter(event) {
-    const btn  = event.currentTarget
-    const kind = btn.dataset.kind
+    const btn = event.currentTarget
+    this.activeKind = btn.dataset.kind
 
-    this.activeFilter = kind
-
-    // Update button active styles
     this.filterBtnTargets.forEach(b => {
-      const active = b.dataset.kind === kind
-      b.classList.toggle("bg-primary", active)
+      const active = b.dataset.kind === this.activeKind
+      b.classList.toggle("bg-primary",          active)
       b.classList.toggle("text-primary-content", active)
-      b.classList.toggle("bg-base-300", !active)
+      b.classList.toggle("bg-base-300",          !active)
       b.classList.toggle("text-base-content/60", !active)
     })
 
-    // Show/hide rows
-    this.rowTargets.forEach(row => {
-      const match = kind === "all" || row.dataset.kind === kind
-      row.classList.toggle("hidden", !match)
+    this.#applyFilters()
+  }
+
+  filterStatus(event) {
+    const btn = event.currentTarget
+    this.activeStatus = btn.dataset.status
+
+    this.statusBtnTargets.forEach(b => {
+      const active = b.dataset.status === this.activeStatus
+      b.classList.toggle("bg-primary",          active)
+      b.classList.toggle("text-primary-content", active)
+      b.classList.toggle("bg-base-300",          !active)
+      b.classList.toggle("text-base-content/60", !active)
+      // restore idea/confirmed icon tint when inactive
+      if (!active) {
+        if (b.dataset.status === "idea")      b.classList.add("text-base-content/40")
+        if (b.dataset.status === "confirmed") b.classList.add("text-primary")
+      }
+      if (active) {
+        b.classList.remove("text-base-content/40", "text-primary")
+      }
     })
 
-    // Hide date group headers that have no visible rows
+    this.#applyFilters()
+  }
+
+  #applyFilters() {
+    this.rowTargets.forEach(row => {
+      const kindMatch   = this.activeKind   === "all" || row.dataset.kind   === this.activeKind
+      const statusMatch = this.activeStatus === "all" || row.dataset.status === this.activeStatus
+      row.classList.toggle("hidden", !(kindMatch && statusMatch))
+    })
+
     this.dateGroupTargets.forEach(group => {
       const rows = group.querySelectorAll("[data-timeline-target~='row']")
       const anyVisible = Array.from(rows).some(r => !r.classList.contains("hidden"))

@@ -105,6 +105,12 @@
                       border-0 border-b border-base-content/15 rounded-none px-0 pb-2
                       focus:outline-none focus:border-primary placeholder:text-base-content/25" %>
 
+        <%# URL %>
+        <%= f.url_field :url, placeholder: "Link / URL (optional)",
+              class: "w-full text-sm text-base-content/70 bg-transparent
+                      border-0 border-b border-base-content/15 rounded-none px-0 pb-2
+                      focus:outline-none focus:border-primary placeholder:text-base-content/25" %>
+
         <%# Notes %>
         <%= f.text_area :notes, placeholder: "Notes (optional)", rows: 2,
               class: "w-full text-sm text-base-content/70 bg-transparent
