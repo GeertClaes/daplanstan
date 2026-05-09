@@ -135,9 +135,13 @@ class TripItemsController < ApplicationController
     items.each do |data|
       next skipped    += 1 if data["name"].blank?
       if existing_names.include?(data["name"].downcase)
-        if data["lat"].present? && data["lng"].present?
-          existing = @trip.trip_items.find_by("lower(name) = ?", data["name"].downcase)
-          existing.update_columns(latitude: data["lat"], longitude: data["lng"]) if existing && !existing.geocoded?
+        existing = @trip.trip_items.find_by("lower(name) = ?", data["name"].downcase)
+        if existing
+          updates = {}
+          updates[:latitude]  = data["lat"] if data["lat"].present? && !existing.geocoded?
+          updates[:longitude] = data["lng"] if data["lng"].present? && !existing.geocoded?
+          updates[:url]       = data["url"] if data["url"].present? && existing.url.blank?
+          existing.update_columns(updates) if updates.any?
         end
         next duplicates += 1
       end
