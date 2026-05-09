@@ -70,6 +70,20 @@
                       border-0 border-b border-base-content/15 rounded-none px-0 pb-2
                       focus:outline-none focus:border-primary placeholder:text-base-content/25" %>
 
+        <%# Manual coordinates — override geocoding %>
+        <div class="flex gap-3">
+          <%= f.number_field :latitude, step: "any", placeholder: "Lat (optional)",
+                value: item.latitude.present? ? "%.6f" % item.latitude : nil,
+                class: "w-0 flex-1 text-sm text-base-content/60 bg-transparent font-mono
+                        border-0 border-b border-base-content/10 rounded-none px-0 pb-2
+                        focus:outline-none focus:border-primary placeholder:text-base-content/20" %>
+          <%= f.number_field :longitude, step: "any", placeholder: "Lng (optional)",
+                value: item.longitude.present? ? "%.6f" % item.longitude : nil,
+                class: "w-0 flex-1 text-sm text-base-content/60 bg-transparent font-mono
+                        border-0 border-b border-base-content/10 rounded-none px-0 pb-2
+                        focus:outline-none focus:border-primary placeholder:text-base-content/20" %>
+        </div>
+
         <%# Amount + Currency %>
         <div class="flex items-end gap-3">
           <%= f.number_field :amount, step: "0.01", placeholder: "Amount (optional)",

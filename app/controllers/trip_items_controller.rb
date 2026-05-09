@@ -178,7 +178,8 @@ class TripItemsController < ApplicationController
     params.require(:trip_item).permit(
       :kind, :name, :status, :notes,
       :starts_at, :ends_at,
-      :address, :amount, :currency, :confirmation_ref
+      :address, :latitude, :longitude,
+      :amount, :currency, :confirmation_ref
     )
   end
 end

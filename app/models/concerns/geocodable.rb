@@ -44,6 +44,7 @@ module Geocodable
   end
 
   def geocode_fallback
+    center = trip_geocoded_center
     queries = []
     if address.present?
       parts = address.split(",").map(&:strip)
@@ -54,8 +55,21 @@ module Geocodable
     queries << name
     queries.uniq.each do |q|
       result = Geocoder.search(q).first
-      return result if result
+      next unless result
+      if center
+        dist = Geocoder::Calculations.distance_between(center, [ result.latitude, result.longitude ], units: :km)
+        next if dist > 2000
+      end
+      return result
     end
     nil
+  end
+
+  def trip_geocoded_center
+    geocoded = trip.trip_items.where.not(latitude: nil, longitude: nil).where.not(id: id)
+    return nil unless geocoded.exists?
+    lats = geocoded.pluck(:latitude).map(&:to_f)
+    lngs = geocoded.pluck(:longitude).map(&:to_f)
+    [ lats.sum / lats.size, lngs.sum / lngs.size ]
   end
 end
