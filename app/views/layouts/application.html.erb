@@ -24,6 +24,10 @@
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+
+    <% if Rails.env.production? %>
+      <script defer data-domain="whats.daplanstan.com" src="https://plausible.daplanstan.com/js/script.js"></script>
+    <% end %>
   </head>
 
   <%# h-dvh = dynamic viewport height (accounts for mobile browser chrome) %>

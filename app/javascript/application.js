@@ -7,6 +7,13 @@ import "controllers"
 //    stores it on <html> so CSS can pick the right slide direction.
 // 2. turbo:before-render — wraps the DOM swap in startViewTransition.
 // 3. turbo:render — cleans up the direction attribute.
+// Plausible: fire a pageview on each Turbo navigation
+document.addEventListener("turbo:load", () => {
+  if (typeof window.plausible === "function") {
+    window.plausible("pageview")
+  }
+})
+
 document.addEventListener("turbo:click", (event) => {
   const el = event.target.closest("[data-turbo-direction]")
   const dir = el?.dataset.turboDirection ?? "forward"
