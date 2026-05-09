@@ -31,8 +31,9 @@ class TripItemsController < ApplicationController
   def import
     if request.post? && params[:confirm] == "1"
       result = bulk_create_items(JSON.parse(params[:items_json]))
-      msg    = "#{result[:created]} idea(s) imported."
+      msg    = "#{result[:created]} idea(s) added."
       msg   += " #{result[:skipped]} skipped (missing name)." if result[:skipped] > 0
+      msg   += " Map pins will appear shortly."
       redirect_to trip_path(@trip, tab: "itinerary"), notice: msg
     elsif request.post?
       raw = params[:items_json].presence || params[:json_file]&.read
@@ -124,14 +125,12 @@ class TripItemsController < ApplicationController
   VALID_IMPORT_KINDS = TripItem.kinds.keys.to_set
 
   def bulk_create_items(items)
-    created = 0
-    skipped = 0
-    # Geocoding makes one external HTTP call per item — skip during bulk import
-    # to avoid request timeouts. Items geocode lazily on first save with an address change.
+    created_ids = []
+    skipped     = 0
     TripItem.skip_callback(:save, :after, :geocode_from_address)
     items.each do |data|
       next skipped += 1 if data["name"].blank?
-      @trip.trip_items.create!(
+      item = @trip.trip_items.create!(
         name:      data["name"],
         kind:      VALID_IMPORT_KINDS.include?(data["kind"].to_s) ? data["kind"].to_s : "other",
         status:    "idea",
@@ -143,12 +142,13 @@ class TripItemsController < ApplicationController
         currency:  data["currency"].presence,
         added_by:  current_user
       )
-      created += 1
+      created_ids << item.id
     rescue => e
       Rails.logger.error "[TripItems#import] skipped item: #{e.message}"
       skipped += 1
     end
-    { created: created, skipped: skipped }
+    GeocodeTripItemsJob.perform_later(created_ids, @trip.id) if created_ids.any?
+    { created: created_ids.size, skipped: skipped }
   ensure
     TripItem.set_callback(:save, :after, :geocode_from_address)
   end
