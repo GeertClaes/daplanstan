@@ -91,7 +91,7 @@
           <% end %>
 
           <% if @preview_items.count { |i| i["name"].present? } > 0 %>
-            <%= form_with url: import_trip_trip_items_path(@trip), method: :post, class: "flex-1" do |f| %>
+            <%= form_with url: import_trip_trip_items_path(@trip), method: :post, class: "flex-1", data: { turbo: false } do |f| %>
               <%= f.hidden_field :confirm, value: "1" %>
               <%= f.hidden_field :items_json, value: @raw_json %>
               <%= f.submit "Add to itinerary", class: "btn btn-primary btn-sm w-full" %>
@@ -180,7 +180,7 @@ My trip: [DESCRIBE YOUR TRIP HERE]</div>
             </div>
           <% end %>
 
-          <%= form_with url: import_trip_trip_items_path(@trip), method: :post do |f| %>
+          <%= form_with url: import_trip_trip_items_path(@trip), method: :post, data: { turbo: false } do |f| %>
 
             <%# File upload %>
             <div class="mb-3">
