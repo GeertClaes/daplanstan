@@ -21,6 +21,7 @@ Rails.application.routes.draw do
     resources :trips do
       member do
         post  :regenerate_inbound_email
+        post  :geocode_missing
         get   :cover
         patch :update_cover
         post  :refresh_cover

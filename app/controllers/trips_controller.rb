@@ -25,6 +25,7 @@ class TripsController < ApplicationController
     @inbox_items = @trip.inbox_items.order(received_at: :desc).limit(50)
     @inbox_pending_count = @trip.inbox_items.where(review_status: :pending_review).count
     @is_owner = current_member_for(@trip)&.owner?
+    @missing_geo_count = @trip_items.count { |i| !i.geocoded? }
   end
 
   def new
@@ -88,6 +89,17 @@ class TripsController < ApplicationController
     @trip.update_columns(cover_image_url: nil)
     FetchTripCoverImageJob.perform_now(@trip.id)
     redirect_to cover_trip_path(@trip)
+  end
+
+  def geocode_missing
+    missing_ids = @trip.trip_items.reject(&:geocoded?).map(&:id)
+    if missing_ids.any?
+      GeocodeTripItemsJob.perform_later(missing_ids, @trip.id)
+      flash[:notice] = "Geocoding #{missing_ids.size} item#{"s" if missing_ids.size != 1} — map pins will appear shortly."
+    else
+      flash[:notice] = "All stops already have location data."
+    end
+    redirect_to @trip
   end
 
   private

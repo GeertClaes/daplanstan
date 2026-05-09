@@ -22,6 +22,9 @@ class InboxItemsController < ApplicationController
     when "discard"
       @item.update!(review_status: :discarded, reviewed_by: current_user, reviewed_at: Time.current)
       redirect_to trip_inbox_items_path(@trip), notice: "Discarded."
+    when "relink"
+      @item.fill_missing_links!(current_user)
+      redirect_to trip_inbox_item_path(@trip, @item), notice: "Links updated \u2014 any missing items or expenses have been created."
     when "retry"
       @item.update!(parse_status: :unparsed)
       ParseInboxItemJob.perform_later(@item.id)
