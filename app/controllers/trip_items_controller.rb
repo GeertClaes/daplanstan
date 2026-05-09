@@ -33,6 +33,7 @@ class TripItemsController < ApplicationController
       result = bulk_create_items(JSON.parse(params[:items_json]))
       msg    = "#{result[:created]} idea(s) added."
       msg   += " #{result[:skipped]} skipped (missing name)." if result[:skipped] > 0
+      msg   += " #{result[:duplicates]} skipped (already in itinerary)." if result[:duplicates] > 0
       msg   += " Map pins will appear shortly." if result[:geocoding_queued] > 0
       redirect_to trip_path(@trip, tab: "itinerary"), notice: msg
     elsif request.post?
@@ -125,12 +126,15 @@ class TripItemsController < ApplicationController
   VALID_IMPORT_KINDS = TripItem.kinds.keys.to_set
 
   def bulk_create_items(items)
-    created          = 0
-    skipped          = 0
+    created           = 0
+    skipped           = 0
+    duplicates        = 0
     needs_geocode_ids = []
+    existing_names    = @trip.trip_items.pluck(:name).map(&:downcase).to_set
     TripItem.skip_callback(:save, :after, :geocode_from_address)
     items.each do |data|
-      next skipped += 1 if data["name"].blank?
+      next skipped    += 1 if data["name"].blank?
+      next duplicates += 1 if existing_names.include?(data["name"].downcase)
       item = @trip.trip_items.create!(
         name:      data["name"],
         kind:      VALID_IMPORT_KINDS.include?(data["kind"].to_s) ? data["kind"].to_s : "other",
@@ -146,13 +150,14 @@ class TripItemsController < ApplicationController
         added_by:  current_user
       )
       created += 1
+      existing_names << item.name.downcase
       needs_geocode_ids << item.id unless item.geocoded?
     rescue => e
       Rails.logger.error "[TripItems#import] skipped item: #{e.message}"
       skipped += 1
     end
     GeocodeTripItemsJob.perform_later(needs_geocode_ids, @trip.id) if needs_geocode_ids.any?
-    { created: created, skipped: skipped, geocoding_queued: needs_geocode_ids.size }
+    { created: created, skipped: skipped, duplicates: duplicates, geocoding_queued: needs_geocode_ids.size }
   ensure
     TripItem.set_callback(:save, :after, :geocode_from_address)
   end
