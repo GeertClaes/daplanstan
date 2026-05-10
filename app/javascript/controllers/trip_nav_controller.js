@@ -30,12 +30,14 @@ export default class extends Controller {
 
   show(tab) {
     this.panelTargets.forEach(p => {
-      const visible = p.dataset.tab === tab
+      const visible   = p.dataset.tab === tab
+      const wasHidden = p.style.display === "none"
       p.style.display = visible ? "" : "none"
-      // When the itinerary panel is revealed, tell Leaflet to recalculate its
-      // container size. Without this, navigating away and back leaves the map
-      // initialised at 0×0 (the panel was hidden when Leaflet first connected).
-      if (visible && tab === "itinerary") {
+      // Only fire map:resize when the itinerary panel transitions hidden→visible.
+      // Turbo morph also calls show() via turbo:render while the panel is already
+      // visible — skipping the event there prevents fitBounds() from resetting the
+      // user's zoom/pan position on every live-update.
+      if (visible && wasHidden && tab === "itinerary") {
         const mapEl = p.querySelector("[data-controller='map']")
         if (mapEl) mapEl.dispatchEvent(new CustomEvent("map:resize"))
       }

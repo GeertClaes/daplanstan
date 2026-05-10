@@ -27,6 +27,9 @@ export default class extends Controller {
   }
 
   #onStart(event) {
+    // Leaflet needs full touch control for pan/pinch-zoom — don't intercept.
+    if (event.target.closest(".leaflet-container")) return
+
     const el = this.#scrollableParent(event.target)
     const scrollTop = el ? el.scrollTop : window.scrollY
     if (scrollTop > 0) return
