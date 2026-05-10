@@ -2,7 +2,7 @@
 <% content_for :main_class, "flex flex-col overflow-hidden" %>
 
 <%# ── Nav band ── %>
-<div class="h-14 shrink-0 max-w-sm mx-auto w-full px-4 flex items-center justify-between">
+<div class="h-14 shrink-0 max-w-sm sm:max-w-md mx-auto w-full px-4 flex items-center justify-between">
 
   <%= link_to trip_path(@trip, tab: "itinerary"),
         class: "flex items-center gap-2 bg-base-300/70 backdrop-blur-sm text-base-content/70
@@ -46,7 +46,7 @@
 
 <%# ── Card ── %>
 <div class="flex-1 min-h-0 px-4 pb-4">
-  <div class="max-w-sm mx-auto h-full bg-base-200 border border-base-content/10 rounded-3xl
+  <div class="max-w-sm sm:max-w-md mx-auto h-full bg-base-200 border border-base-content/10 rounded-3xl
               overflow-visible flex flex-col">
 
     <%# ── TOP SECTION: name + status ── %>
@@ -90,9 +90,26 @@
 
       <%# Address %>
       <% if @item.address.present? %>
-        <div class="px-3 py-2.5 rounded-xl bg-base-300/20 border border-base-content/5">
-          <p class="dp-label">Address</p>
-          <p class="text-xs text-base-content/70 leading-snug mt-0.5"><%= @item.address %></p>
+        <div data-controller="clipboard" data-clipboard-text-value="<%= @item.address %>">
+          <button type="button"
+                  data-action="click->clipboard#copy"
+                  class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl
+                         bg-base-300/20 border border-base-content/5
+                         hover:bg-primary/10 hover:border-primary/20 transition-colors
+                         text-left group">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-base-content/40 group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <div class="flex-1 min-w-0">
+              <p class="dp-label">Address</p>
+              <p class="text-xs text-base-content/70 leading-snug mt-0.5"><%= @item.address %></p>
+            </div>
+            <span data-clipboard-target="label"
+                  class="text-[10px] text-primary/60 group-hover:text-primary transition-colors shrink-0 font-medium">
+              Copy
+            </span>
+          </button>
         </div>
       <% end %>
 

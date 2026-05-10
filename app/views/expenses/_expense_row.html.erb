@@ -3,12 +3,15 @@
 %>
 <div class="flex items-stretch border-b border-base-content/8 last:border-b-0 hover:bg-base-300/30 transition-colors">
 
-  <%# Left tap target — opens expense show %>
+  <%# Tap target — opens expense show %>
   <%= link_to trip_expense_path(trip, expense), class: "flex items-center gap-3 flex-1 min-w-0 px-4 py-3.5", data: { turbo_direction: "forward" } do %>
 
-    <%# Category icon %>
-    <div class="shrink-0 w-9 <%= expense.confirmed? ? "text-base-content/30" : "text-warning" %>">
+    <%# Category icon [+ label on sm+] %>
+    <div class="shrink-0 flex items-center gap-1.5 <%= expense.confirmed? ? "text-base-content/30" : "text-warning" %>">
       <%= expense_category_icon(expense.category, css_class: "h-7 w-7") %>
+      <span class="hidden sm:block text-[11px] font-medium w-10 leading-tight">
+        <%= expense_category_label(expense.category) %>
+      </span>
     </div>
 
     <%# Amount + description + status %>
@@ -25,11 +28,19 @@
       </p>
     </div>
 
-    <%# Avatar + relative date + chevron %>
+    <%# [name on sm+] + avatar + [full date on sm+ / relative on mobile] + › %>
     <div class="flex flex-col items-end gap-1.5 shrink-0">
-      <%= image_tag expense.paid_by.avatar(size: 32),
-            class: "w-7 h-7 rounded-full", referrerpolicy: "no-referrer" %>
-      <p class="text-[11px] text-base-content/40"><%= relative_expense_date(expense.expense_date) %></p>
+      <div class="flex items-center gap-1.5">
+        <span class="hidden sm:block text-[11px] text-base-content/40 max-w-[72px] truncate text-right leading-tight">
+          <%= expense.paid_by.name.split(" ").first %>
+        </span>
+        <%= image_tag expense.paid_by.avatar(size: 32),
+              class: "w-7 h-7 rounded-full", referrerpolicy: "no-referrer" %>
+      </div>
+      <p class="text-[11px] text-base-content/40">
+        <span class="sm:hidden"><%= relative_expense_date(expense.expense_date) %></span>
+        <span class="hidden sm:inline"><%= expense.expense_date.strftime("%-d %b %Y") %></span>
+      </p>
       <span class="text-base-content/25 text-sm leading-none">›</span>
     </div>
 

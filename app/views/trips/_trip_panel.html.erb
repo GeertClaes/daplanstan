@@ -1,6 +1,6 @@
 <% is_owner = current_member&.owner? %>
 
-<div class="max-w-sm mx-auto px-4 py-4"
+<div class="max-w-sm sm:max-w-2xl mx-auto px-4 py-4"
      data-controller="trip-delete"
      data-trip-delete-title-value="<%= @trip.title %>">
 
@@ -28,86 +28,142 @@
       <div class="absolute -right-2.5 w-5 h-5 rounded-full bg-base-100 z-10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
     </div>
 
-    <%# ── MIDDLE: dates, inbox, travellers ── %>
-    <div class="px-5 py-4 space-y-4">
+    <%# ── MIDDLE: trip details + quick stats (desktop) ── %>
+    <div class="sm:flex sm:divide-x sm:divide-base-content/10">
 
-      <%# WHEN / UNTIL %>
-      <div class="grid grid-cols-2 gap-2">
-        <div class="px-3 py-2.5 rounded-xl bg-base-300/20 border border-base-content/5">
-          <p class="dp-label">When</p>
-          <p class="text-xs font-semibold text-base-content leading-tight mt-0.5">
-            <%= @trip.start_date.strftime("%-d %b %Y") %>
-          </p>
-        </div>
-        <div class="px-3 py-2.5 rounded-xl bg-base-300/20 border border-base-content/5">
-          <p class="dp-label">Until</p>
-          <p class="text-xs font-semibold text-base-content leading-tight mt-0.5">
-            <%= @trip.end_date.strftime("%-d %b %Y") %>
-          </p>
-        </div>
-      </div>
+      <%# Left: dates, inbox, travellers %>
+      <div class="px-5 py-4 space-y-4 sm:flex-1 sm:min-w-0">
 
-      <%# INBOX — copy address + open inbox button %>
-      <div data-controller="clipboard" data-clipboard-text-value="<%= @trip.inbound_email %>">
-        <p class="dp-label mb-1.5">Inbox</p>
-
-        <%# Copy address row %>
-        <button type="button"
-                data-action="click->clipboard#copy"
-                class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl
-                       bg-base-300/20 border border-base-content/5
-                       hover:bg-primary/10 hover:border-primary/20 transition-colors
-                       text-left group mb-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-base-content/40 group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-          </svg>
-          <span class="font-mono text-xs text-base-content/70 flex-1 truncate"><%= @trip.inbound_email %></span>
-          <span data-clipboard-target="label"
-                class="text-[10px] text-primary/60 group-hover:text-primary transition-colors shrink-0 font-medium">
-            Copy
-          </span>
-        </button>
-
-        <%# Open inbox button %>
-        <% count = @inbox_items.size %>
-        <div class="grid grid-cols-2">
-        <%= link_to trip_inbox_items_path(@trip),
-              class: "flex items-center gap-2.5 px-3 py-2.5 rounded-xl
-                      bg-primary/10 border border-primary/20
-                      hover:bg-primary/20 transition-colors",
-              data: { turbo_direction: "forward" } do %>
-          <%= inline_svg("Inbox.svg", css_class: "h-4 w-4 shrink-0 text-primary") %>
-          <div class="min-w-0">
-            <p class="dp-label">Inbox</p>
-            <p class="text-xs font-semibold text-primary leading-tight mt-0.5">
-              <%= count %> email<%= count == 1 ? "" : "s" %> ›
-              <% if @inbox_pending_count > 0 %>
-                <span class="text-warning font-semibold">· <%= @inbox_pending_count %> to review</span>
-              <% end %>
+        <%# WHEN / UNTIL %>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="px-3 py-2.5 rounded-xl bg-base-300/20 border border-base-content/5">
+            <p class="dp-label">When</p>
+            <p class="text-xs font-semibold text-base-content leading-tight mt-0.5">
+              <%= @trip.start_date.strftime("%-d %b %Y") %>
             </p>
           </div>
-        <% end %>
+          <div class="px-3 py-2.5 rounded-xl bg-base-300/20 border border-base-content/5">
+            <p class="dp-label">Until</p>
+            <p class="text-xs font-semibold text-base-content leading-tight mt-0.5">
+              <%= @trip.end_date.strftime("%-d %b %Y") %>
+            </p>
+          </div>
         </div>
-      </div>
 
-      <%# TRAVELLERS %>
-      <div>
-        <p class="dp-label mb-2">Travellers</p>
-        <div class="flex flex-wrap gap-2">
-          <% @members.each do |member| %>
-            <div class="flex flex-col items-center gap-1 p-2 rounded-xl bg-base-300/20 border border-base-content/5 w-16">
-              <div class="w-10 h-10 rounded-full overflow-hidden ring-2 ring-base-content/10">
-                <%= image_tag member.traveler.avatar(size: 64),
-                      alt: member.traveler.name,
-                      class: "w-full h-full object-cover",
-                      referrerpolicy: "no-referrer" %>
-              </div>
-              <p class="text-[10px] text-base-content/60 leading-tight text-center truncate w-full">
-                <%= member.traveler.name.split(" ").first %>
+        <%# INBOX — copy address + open inbox button %>
+        <div data-controller="clipboard" data-clipboard-text-value="<%= @trip.inbound_email %>">
+          <p class="dp-label mb-1.5">Inbox</p>
+
+          <%# Copy address row %>
+          <button type="button"
+                  data-action="click->clipboard#copy"
+                  class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl
+                         bg-base-300/20 border border-base-content/5
+                         hover:bg-primary/10 hover:border-primary/20 transition-colors
+                         text-left group mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-base-content/40 group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            <span class="font-mono text-xs text-base-content/70 flex-1 truncate"><%= @trip.inbound_email %></span>
+            <span data-clipboard-target="label"
+                  class="text-[10px] text-primary/60 group-hover:text-primary transition-colors shrink-0 font-medium">
+              Copy
+            </span>
+          </button>
+
+          <%# Open inbox button %>
+          <% count = @inbox_items.size %>
+          <div class="grid grid-cols-2">
+          <%= link_to trip_inbox_items_path(@trip),
+                class: "flex items-center gap-2.5 px-3 py-2.5 rounded-xl
+                        bg-primary/10 border border-primary/20
+                        hover:bg-primary/20 transition-colors",
+                data: { turbo_direction: "forward" } do %>
+            <%= inline_svg("Inbox.svg", css_class: "h-4 w-4 shrink-0 text-primary") %>
+            <div class="min-w-0">
+              <p class="dp-label">Inbox</p>
+              <p class="text-xs font-semibold text-primary leading-tight mt-0.5">
+                <%= count %> email<%= count == 1 ? "" : "s" %> ›
+                <% if @inbox_pending_count > 0 %>
+                  <span class="text-warning font-semibold">· <%= @inbox_pending_count %> to review</span>
+                <% end %>
               </p>
             </div>
           <% end %>
+          </div>
         </div>
+
+        <%# TRAVELLERS %>
+        <div>
+          <p class="dp-label mb-2">Travellers</p>
+          <div class="flex flex-wrap gap-2">
+            <% @members.each do |member| %>
+              <div class="flex flex-col items-center gap-1 p-2 rounded-xl bg-base-300/20 border border-base-content/5 w-16">
+                <div class="w-10 h-10 rounded-full overflow-hidden ring-2 ring-base-content/10">
+                  <%= image_tag member.traveler.avatar(size: 64),
+                        alt: member.traveler.name,
+                        class: "w-full h-full object-cover",
+                        referrerpolicy: "no-referrer" %>
+                </div>
+                <p class="text-[10px] text-base-content/60 leading-tight text-center truncate w-full">
+                  <%= member.traveler.name.split(" ").first %>
+                </p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+      </div>
+
+      <%# Right: quick stats — desktop only %>
+      <% confirmed_count = @trip_items.count(&:confirmed?) %>
+      <% idea_count      = @trip_items.count { |i| i.idea? } %>
+      <% exp_by_currency = @expenses.group_by(&:currency) %>
+      <% next_stop = @trip_items
+                       .select { |i| i.confirmed? && i.starts_at.present? && i.starts_at >= Time.current }
+                       .min_by(&:starts_at) %>
+      <div class="hidden sm:flex sm:flex-col sm:w-[220px] sm:shrink-0 px-5 py-4 space-y-5">
+
+        <%# Stops %>
+        <div>
+          <p class="dp-label mb-2">Stops</p>
+          <p class="text-3xl font-bold font-mono text-base-content leading-none mb-1.5">
+            <%= @trip_items.size %>
+          </p>
+          <div class="flex gap-3 text-xs">
+            <span class="text-base-content/50">
+              <span class="text-primary font-semibold"><%= confirmed_count %></span> confirmed
+            </span>
+            <span class="text-base-content/50">
+              <span class="font-semibold"><%= idea_count %></span> ideas
+            </span>
+          </div>
+        </div>
+
+        <%# Total spend %>
+        <% if exp_by_currency.any? %>
+          <div>
+            <p class="dp-label mb-2">Total spend</p>
+            <% exp_by_currency.each do |currency, exps| %>
+              <p class="text-xl font-bold font-mono text-base-content leading-tight">
+                <%= number_with_precision(exps.sum(&:amount), precision: 2) %>
+                <span class="text-sm font-sans font-normal text-base-content/40 ml-0.5"><%= currency %></span>
+              </p>
+            <% end %>
+          </div>
+        <% end %>
+
+        <%# Next upcoming confirmed stop %>
+        <% if next_stop %>
+          <div>
+            <p class="dp-label mb-2">Next up</p>
+            <p class="text-xs font-semibold text-base-content leading-snug"><%= next_stop.name %></p>
+            <p class="text-xs text-base-content/50 mt-0.5">
+              <%= next_stop.starts_at.strftime("%-d %b · %H:%M") %>
+            </p>
+          </div>
+        <% end %>
+
       </div>
 
     </div>

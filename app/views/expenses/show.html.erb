@@ -4,7 +4,7 @@
 <% inbox_item_id = @expense.inbox_item_id %>
 
 <%# ── Nav band (h-14 = 56px — matches the spacer in _form so cards are same size) ── %>
-<div class="h-14 shrink-0 max-w-sm mx-auto w-full px-4 flex items-center justify-between">
+<div class="h-14 shrink-0 max-w-sm sm:max-w-md mx-auto w-full px-4 flex items-center justify-between">
 
   <%= link_to trip_path(@trip, tab: "expenses"),
         class: "flex items-center gap-2 bg-base-300/70 backdrop-blur-sm text-base-content/70
@@ -48,7 +48,7 @@
 
 <%# ── Card — fills remaining height, overflow-visible for punch-hole circles ── %>
 <div class="flex-1 min-h-0 px-4 pb-4">
-  <div class="max-w-sm mx-auto h-full bg-base-200 border border-base-content/10 rounded-3xl
+  <div class="max-w-sm sm:max-w-md mx-auto h-full bg-base-200 border border-base-content/10 rounded-3xl
               overflow-visible flex flex-col">
 
     <%# ── TOP SECTION: avatar + amount + status ── %>
